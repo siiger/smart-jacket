@@ -2,7 +2,6 @@ import 'package:smart_arrays_peaks/smart_arrays_peaks.dart';
 import 'dart:typed_data';
 
 class CalculatingUtil {
-  CalculatingUtil._();
   //double frq = 9, irreg = 8, amp = 7;
   static double vAL0 = 100.0, nOISE = 0.01 * vAL0;
 
@@ -10,8 +9,7 @@ class CalculatingUtil {
     List<int> outFq = [1];
     Float64List p1 = new Float64List.fromList(p0);
 
-    List<int> out = PeakPicker1D.detectPeaks(
-        p1, 0, p1.length, 2 * nOISE, 0.001, PeakPicker1D.PICK_POSNEG, 0);
+    List<int> out = PeakPicker1D.detectPeaks(p1, 0, p1.length, 2 * nOISE, 0.001, PeakPicker1D.PICK_POSNEG, 0);
 
     double fq = 0;
     int j = 0, i = 0, n = t0.length;
@@ -49,8 +47,7 @@ class CalculatingUtil {
   static double findIrregBr(List<double> p0, List<DateTime> t0) {
     //vector<int> outIr;
     Float64List p1 = new Float64List.fromList(p0);
-    List<int> out = PeakPicker1D.detectPeaks(
-        p1, 0, p1.length, 2 * nOISE, 0.001, PeakPicker1D.PICK_POSNEG, 0);
+    List<int> out = PeakPicker1D.detectPeaks(p1, 0, p1.length, 2 * nOISE, 0.001, PeakPicker1D.PICK_POSNEG, 0);
     double irreg = 0;
     int i = 0, n = out.length - 2;
     double vSum = 0;
@@ -58,9 +55,7 @@ class CalculatingUtil {
     for (i = 0; i < n; i++) {
       vSum = vSum +
           ((t0[out[i + 1]].difference(t0[out[i]]).inMilliseconds +
-                          t0[out[i + 1]]
-                              .difference(t0[out[i + 2]])
-                              .inMilliseconds)
+                          t0[out[i + 1]].difference(t0[out[i + 2]]).inMilliseconds)
                       .abs() /
                   (t0[out[i + 1]].difference(t0[out[i]]).inMilliseconds +
                       t0[out[i + 2]].difference(t0[out[i + 1]]).inMilliseconds))
@@ -77,8 +72,7 @@ class CalculatingUtil {
   static double findAmp(List<double> p0) {
     double amp;
     Float64List p1 = new Float64List.fromList(p0);
-    List<int> out = PeakPicker1D.detectPeaks(
-        p1, 0, p1.length, 2 * nOISE, 0.001, PeakPicker1D.PICK_POSNEG, 0);
+    List<int> out = PeakPicker1D.detectPeaks(p1, 0, p1.length, 2 * nOISE, 0.001, PeakPicker1D.PICK_POSNEG, 0);
 
     int i = 0, n = out.length;
     double vSum = 0;

@@ -58,11 +58,6 @@ PCD_HandleTypeDef hpcd_USB_FS;
 
 /* USER CODE BEGIN PV */
 
-
-
-uint16_t writevalue = 0xF5A2;
-uint8_t readvalue = 0xEF; // at the end, readvalue should be equal to writevalue
-//random addresses to write from
 uint32_t currentWriteaddress = 0x00;
 uint32_t lastWriteaddress =0x00;
 uint32_t maxWriteaddress;
@@ -145,16 +140,7 @@ int main(void)
   lastWriteaddress = maxWriteaddress;
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*) adc_buf, 3);
   HAL_TIM_Base_Start_IT(&htim2);
-  /*for (uint32_t a = 0; a < lastWriteaddress; a=a+256) {
-	  fram.readArray(a, valueRead, 256);
-        readvalue=byteVal; }
-*/
-  /*for (uint32_t a = writeaddress; a < fram.getMaxMemAdr(); a=a+0x0002) {
-      fram.read(a, &byteVal);
-      readvalue=byteVal; }
-*/
-
-  //fram.read(last-0x0002, &readvalue);
+  
   while (1)
   {
 	  UTIL_SEQ_Run(UTIL_SEQ_DEFAULT);
@@ -561,11 +547,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 	  //value[4] = (uint8_t)(adc_buf[2] & 0x00FF);
 	  //value[5] = (uint8_t)(adc_buf[2] >> 8);
 
-	  /*
-	  value[0] = (uint16_t)(adc_buf[0]);
-      value[1] = (uint16_t)(adc_buf[1]);
-	  value[2] = (uint16_t)(adc_buf[2]);
-	  */
 	  if(flag==0x01){
 		  if(currentWriteaddress+0x000004<maxWriteaddress){
 		  fram.writeArray(currentWriteaddress, value, 0x000004);
@@ -576,8 +557,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 	  if(flag==0x00){
 		  UTIL_SEQ_SetTask( 1<<CFG_TASK_RECEIVE_ADC_ID, CFG_SCH_PRIO_0);
 	    }
-	  //fram.read(writeaddress, &readvalue);
-	  //writeaddress++;
 
 }
 
