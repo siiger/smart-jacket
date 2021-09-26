@@ -90,7 +90,7 @@ void P2PS_STM_App_Notification(P2PS_STM_App_Notification_evt_t *pNotification)
 /* USER CODE BEGIN P2PS_STM_WRITE_EVT */
     	
     	        if(pNotification->DataTransfered.pPayload[0] == 0x00)
-    	        {    // get data from ADC
+    	        {    // get data from ADC directly
                      flag =0x00;
     	        }
     	        if(pNotification->DataTransfered.pPayload[0] == 0x01)
