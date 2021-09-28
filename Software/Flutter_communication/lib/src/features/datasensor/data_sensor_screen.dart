@@ -5,7 +5,6 @@ import 'package:flutter_hooks_bloc/flutter_hooks_bloc.dart' as fromHooks;
 
 import 'package:norbusensor/src/core/core_providers.dart';
 import 'package:norbusensor/src/features/datasensor/blocs/bloc_data_sensor/data_sensor_bloc.dart';
-import 'package:norbusensor/src/core/calculating_utils.dart';
 import 'package:norbusensor/src/features/devices/widgets/connection_button_widget.dart';
 
 class DataSensorScreen extends StatelessWidget {
@@ -41,17 +40,7 @@ class DataSensorScreen extends StatelessWidget {
 
 class _ViewDataPanel extends StatelessWidget {
   final sensorCubit;
-  List<DateTime> dataTime = [DateTime.now()];
-  List<double> dataBrSt = [1000.0];
-  List<double> dataBrCh = [1000.0];
-  double frqSt = 0.0;
-  double irregSt = 0.0;
-  double ampSt = 0.0;
-  double frqCh = 0.0;
-  double irregCh = 0.0;
-  double ampCh = 0.0;
-  Oscilloscope scopeOne;
-  Oscilloscope scopeTwo;
+
   final int deltaData = 360;
 
   _ViewDataPanel(this.sensorCubit);
@@ -61,28 +50,21 @@ class _ViewDataPanel extends StatelessWidget {
         cubit: BuildContextX(context).read(sensorBlocProvider),
         buildWhen: (previous, current) => (previous.listSensorData != current.listSensorData),
         builder: (context, state) {
+          List<double> dataBrSt = [1000.0];
+          List<double> dataBrCh = [1000.0];
           int dataLength = state.listSensorData.length;
           if (dataLength != 0) {
             if (dataLength <= deltaData) {
-              dataTime = state.listSensorData.map((e) => e.lastTime).toList();
               dataBrSt = state.listSensorData.map((e) => e.stbreath).toList();
               dataBrCh = state.listSensorData.map((e) => e.chbreath).toList();
             } else if (dataLength > deltaData) {
-              dataTime =
-                  state.listSensorData.getRange(dataLength - deltaData, dataLength).map((e) => e.lastTime).toList();
               dataBrSt =
                   state.listSensorData.getRange(dataLength - deltaData, dataLength).map((e) => e.stbreath).toList();
               dataBrCh =
                   state.listSensorData.getRange(dataLength - deltaData, dataLength).map((e) => e.chbreath).toList();
             }
-            //frqSt = CalculatingUtil.findFreq(dataBrSt, dataTime);
-            //irregSt = CalculatingUtil.findIrregBr(dataBrSt, dataTime);
-            //ampSt = CalculatingUtil.findAmp(dataBrSt);
-            //frqCh = CalculatingUtil.findFreq(dataBrCh, dataTime);
-            //irregCh = CalculatingUtil.findIrregBr(dataBrCh, dataTime);
-            //ampCh = CalculatingUtil.findAmp(dataBrCh);
           }
-          scopeOne = Oscilloscope(
+          Oscilloscope scopeChest = Oscilloscope(
             showYAxis: true,
             yAxisColor: Colors.orange,
             padding: 10.0,
@@ -93,7 +75,7 @@ class _ViewDataPanel extends StatelessWidget {
             dataSet: dataBrCh,
           );
 
-          scopeTwo = Oscilloscope(
+          Oscilloscope scopeStom = Oscilloscope(
             showYAxis: true,
             padding: 10.0,
             backgroundColor: Colors.black,
@@ -105,145 +87,19 @@ class _ViewDataPanel extends StatelessWidget {
 
           return Center(
             child: Column(children: <Widget>[
-              chestPanel(context),
-              stomachPanel(context),
+              Container(
+                width: 360,
+                height: 200,
+                child: scopeChest,
+              ),
+              Container(
+                width: 360,
+                height: 200,
+                child: scopeStom,
+              ),
             ]),
           );
         });
-  }
-
-  Widget chestPanel(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        Container(
-          width: 360,
-          height: 200,
-          child: scopeOne,
-        ),
-        /* Container(
-          width: 360,
-          height: 60,
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Container(
-                  width: 120,
-                  height: 60,
-                  child: ListTile(
-                    contentPadding: EdgeInsets.only(right: 6.0, left: 10),
-                    //leading:
-                    //   Image.asset('assets/images/freq.png'),
-                    title: Text(
-                      'Freq : ${frqCh.toString()} Hz',
-                      style: TextStyle(
-                        color: Colors.green,
-                      ),
-                    ),
-                    //tileColor: Colors.green,
-                  ),
-                ),
-                Container(
-                  width: 120,
-                  height: 60,
-                  child: ListTile(
-                    contentPadding: EdgeInsets.only(right: 6.0, left: 10),
-                    // leading:
-                    //   Image.asset('assets/images/irreg.png'),
-                    title: Text(
-                      'Irreg : ${irregCh.toString()} ',
-                      style: TextStyle(
-                        color: Colors.green,
-                      ),
-                    ),
-                    //tileColor: Colors.green,
-                  ),
-                ),
-                Container(
-                  width: 120,
-                  height: 60,
-                  child: ListTile(
-                    contentPadding: EdgeInsets.only(right: 6.0, left: 10),
-                    //leading:
-                    // Image.asset('assets/images/ampl.png'),
-                    title: Text(
-                      'Amp : ${ampCh.toString()} ',
-                      style: TextStyle(
-                        color: Colors.green,
-                      ),
-                    ),
-                    //tileColor: Colors.green,
-                  ),
-                ),
-              ]),
-        ),
-        */
-      ],
-    );
-  }
-
-  Widget stomachPanel(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        Container(width: 360, height: 200, child: scopeTwo),
-        /* Container(
-          width: 360,
-          height: 60,
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  width: 120,
-                  height: 60,
-                  child: ListTile(
-                    contentPadding: EdgeInsets.only(right: 6.0, left: 10),
-                    //leading:
-                    //  Image.asset('assets/images/freq.png'),
-                    title: Text(
-                      'Freq : ${frqSt.toString()} Hz',
-                      style: TextStyle(
-                        color: Colors.blue,
-                      ),
-                    ),
-                    tileColor: Colors.blue,
-                  ),
-                ),
-                Container(
-                  width: 120,
-                  height: 60,
-                  child: ListTile(
-                    contentPadding: EdgeInsets.only(right: 6.0, left: 10),
-                    // leading:
-                    //   Image.asset('assets/images/irreg.png'),
-                    title: Text(
-                      'Irreg : ${irregSt.toString()} ',
-                      style: TextStyle(
-                        color: Colors.blue,
-                      ),
-                    ),
-                    tileColor: Colors.blue,
-                  ),
-                ),
-                Container(
-                  width: 120,
-                  height: 60,
-                  child: ListTile(
-                    contentPadding: EdgeInsets.only(right: 6.0, left: 10),
-                    //leading:
-                    //   Image.asset('assets/images/ampl.png'),
-                    title: Text(
-                      'Amp : ${ampSt.toString()} ',
-                      style: TextStyle(
-                        color: Colors.blue,
-                      ),
-                    ),
-                    tileColor: Colors.blue,
-                  ),
-                ),
-              ]),
-        ),
-        */
-      ],
-    );
   }
 }
 
