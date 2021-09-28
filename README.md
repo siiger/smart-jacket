@@ -1,10 +1,10 @@
 # smart-jacket
-1. Hardware
+## 1. Hardware
   <img
    src="/Hardware/view.jpeg"
-   width="320"
+   width="520"
   />
-  
-2. Software
+
+## 2. Software
    Dash analytics
    ![Analytics](/Software/Dash_analytics/databoard_image.png)  
