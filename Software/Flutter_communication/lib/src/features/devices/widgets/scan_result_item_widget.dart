@@ -28,7 +28,14 @@ class ScanResultItemWidget extends StatelessWidget {
       child: Container(
           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor.withOpacity(0.4),
+            border: Border(
+              top: BorderSide(
+                color: Colors.amber[100],
+              ),
+              bottom: BorderSide(
+                color: Colors.amber[100],
+              ),
+            ),
             boxShadow: [
               BoxShadow(color: Theme.of(context).focusColor.withOpacity(0.1), blurRadius: 5, offset: Offset(0, 2)),
             ],
@@ -36,7 +43,7 @@ class ScanResultItemWidget extends StatelessWidget {
           child: Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
             Text(
               scanResultItem.name.toString(),
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 16, color: Colors.white),
             ),
             Spacer(),
             ConnectionButtonWidget(BuildContextX(context).read(deviceBlocProvider), scanResultItem),

@@ -5,13 +5,17 @@ import 'package:flutter_hooks_bloc/flutter_hooks_bloc.dart' as fromHooks;
 import 'package:norbusensor/src/core/core_providers.dart';
 import 'package:norbusensor/src/features/devices/widgets/scan_result_item_widget.dart';
 import 'package:norbusensor/src/features/devices/blocs/bloc_device/device_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class ScanDevicesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Find Devices'),
+        title: Text(
+          'Searching Devices',
+          style: TextStyle(color: Colors.white70),
+        ),
         actions: <Widget>[
           _ScanButton(BuildContextX(context).read(deviceBlocProvider)),
         ],
@@ -49,16 +53,39 @@ class _ScanButton extends StatelessWidget {
       cubit: scanCubit,
       buildWhen: (previous, current) => previous.isScanning != current.isScanning,
       builder: (context, state) {
-        return RaisedButton(
-          child: Text(
-            state.isScanning ? "STOP" : "SCAN",
-            style: TextStyle(fontSize: 16),
-          ),
-          color: state.isScanning ? Colors.red : Colors.indigo,
-          textColor: Colors.white,
-          onPressed: () {
-            scanCubit.add(ToggleScanForDevices());
-          },
+        return Stack(
+          alignment: Alignment.center,
+          children: <Widget>[
+            Container(
+              alignment: Alignment.center,
+              width: 35.0,
+              height: 35.0,
+              decoration: new BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(width: 3, color: state.isScanning ? Colors.amber[100] : Colors.amber[100])),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: IconButton(
+                iconSize: 30.0,
+                icon: state.isScanning
+                    ? Icon(Icons.wifi_tethering, color: Colors.amber[100])
+                    : Icon(Icons.wifi_tethering_off, color: Colors.amber[100]),
+                onPressed: () {
+                  scanCubit.add(ToggleScanForDevices());
+                  Fluttertoast.showToast(
+                    msg: state.isScanning ? "Scanning" : "Stop",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.amber[100],
+                    textColor: Colors.black,
+                    fontSize: 16.0,
+                  );
+                },
+              ),
+            ),
+          ],
         );
       },
     );
