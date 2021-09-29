@@ -44,7 +44,7 @@ class ConnectionButtonWidget extends StatelessWidget {
               onPressed: () {
                 connectCubit.add(ToggleConnectionToDevice(device));
                 Fluttertoast.showToast(
-                  msg: state.isConnected ? "Connected" : "Disconnect",
+                  msg: state.isConnected ? "Disconnect" : "Connected",
                   toastLength: Toast.LENGTH_SHORT,
                   gravity: ToastGravity.BOTTOM,
                   timeInSecForIosWeb: 1,

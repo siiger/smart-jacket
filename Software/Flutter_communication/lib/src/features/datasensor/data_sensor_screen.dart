@@ -82,7 +82,7 @@ class _ViewDataPanel extends StatelessWidget {
             yAxisColor: Colors.orange,
             padding: 10.0,
             backgroundColor: Color(0xff20212a),
-            traceColor: Colors.green,
+            traceColor: Colors.green[200],
             yAxisMax: 1900,
             yAxisMin: 1400,
             dataSet: dataBrCh,
@@ -92,7 +92,7 @@ class _ViewDataPanel extends StatelessWidget {
             showYAxis: true,
             padding: 10.0,
             backgroundColor: Color(0xff20212a),
-            traceColor: Colors.blue,
+            traceColor: Colors.blue[200],
             yAxisMax: 2100,
             yAxisMin: 1600,
             dataSet: dataBrSt,
@@ -144,7 +144,6 @@ class _MarkActivityField extends StatelessWidget {
             iconColor: Colors.amber[100],
             child: ExpansionTile(
               backgroundColor: Color(0xff363741),
-              collapsedIconColor: Colors.amber[100],
               childrenPadding: const EdgeInsets.only(
                 left: 5.0,
                 right: 5.0,

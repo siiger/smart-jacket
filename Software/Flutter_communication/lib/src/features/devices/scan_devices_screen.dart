@@ -74,7 +74,7 @@ class _ScanButton extends StatelessWidget {
                 onPressed: () {
                   scanCubit.add(ToggleScanForDevices());
                   Fluttertoast.showToast(
-                    msg: state.isScanning ? "Scanning" : "Stop",
+                    msg: state.isScanning ? "Stop" : "Scanning",
                     toastLength: Toast.LENGTH_SHORT,
                     gravity: ToastGravity.BOTTOM,
                     timeInSecForIosWeb: 1,
