@@ -21,6 +21,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     BuildContextX(context).read(sensorBlocProvider).add(InitSensor());
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: metalTheme,
       navigatorKey: BuildContextX(context).read(navigatorKeyProvider),
       home: fromHooks.BlocBuilder<DeviceBloc, DeviceState>(
