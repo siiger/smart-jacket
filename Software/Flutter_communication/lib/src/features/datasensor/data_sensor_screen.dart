@@ -81,7 +81,7 @@ class _ViewDataPanel extends StatelessWidget {
             showYAxis: true,
             yAxisColor: Colors.orange,
             padding: 10.0,
-            backgroundColor: Color(0xff20212a),
+            backgroundColor: Colors.transparent,
             traceColor: Colors.green[200],
             yAxisMax: 1900,
             yAxisMin: 1400,
@@ -91,7 +91,7 @@ class _ViewDataPanel extends StatelessWidget {
           Oscilloscope scopeStom = Oscilloscope(
             showYAxis: true,
             padding: 10.0,
-            backgroundColor: Color(0xff20212a),
+            backgroundColor: Colors.transparent,
             traceColor: Colors.blue[200],
             yAxisMax: 2100,
             yAxisMin: 1600,
@@ -140,10 +140,12 @@ class _MarkActivityField extends StatelessWidget {
           ),
           child: ListTileTheme(
             textColor: Colors.white,
-            tileColor: Color(0xff363741),
+            tileColor: Colors.transparent,
             iconColor: Colors.amber[100],
             child: ExpansionTile(
-              backgroundColor: Color(0xff363741),
+              collapsedIconColor: Colors.amber[100],
+              iconColor: Colors.amber[100],
+              backgroundColor: Colors.transparent,
               childrenPadding: const EdgeInsets.only(
                 left: 5.0,
                 right: 5.0,
@@ -151,7 +153,7 @@ class _MarkActivityField extends StatelessWidget {
               key: ValueKey('Sensor'),
               title: Text(state.currentActivity,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.white70,
                   )),
               children: List.generate(
                 (state.listActivity.length + 1),
@@ -173,7 +175,7 @@ class _MarkActivityField extends StatelessWidget {
                                       bottom: 15.0,
                                     ),
                                     child: Text(state.listActivity.elementAt(index).toString(),
-                                        style: TextStyle(color: Colors.white), overflow: TextOverflow.ellipsis),
+                                        style: TextStyle(color: Colors.white70), overflow: TextOverflow.ellipsis),
                                   ),
                                   onTap: () {
                                     sensorCubit.add(ChooseActivity(index: index));
@@ -190,7 +192,7 @@ class _MarkActivityField extends StatelessWidget {
                   } else {
                     return Padding(
                       padding: const EdgeInsets.only(
-                        right: 8.0,
+                        right: 5.0,
                       ),
                       child: Row(
                         key: ValueKey('Sensor' + index.toString()),
@@ -243,7 +245,7 @@ class _RealTimeButton extends StatelessWidget {
         return IconButton(
           iconSize: 35.0,
           icon: state.isRealTimeMode
-              ? Icon(Icons.stop_circle_outlined, color: Colors.red[500])
+              ? Icon(Icons.stop_circle_outlined, color: Colors.red[200])
               : Icon(Icons.play_circle, color: Colors.amber[100]),
           onPressed: () {
             sensorCubit.add(ToggleRealTimeDataAccess());
@@ -275,7 +277,7 @@ class _RecToMemoryButton extends StatelessWidget {
         return IconButton(
           iconSize: 35.0,
           icon: state.isRecToMemoryMode
-              ? Icon(Icons.stop_circle_outlined, color: Colors.red[500])
+              ? Icon(Icons.stop_circle_outlined, color: Colors.red[200])
               : Icon(Icons.radio_button_checked, color: Colors.amber[100]),
           onPressed: () {
             sensorCubit.add(ToggleRecDataToMemory());
