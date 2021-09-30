@@ -151,9 +151,9 @@ class _MarkActivityField extends StatelessWidget {
                 right: 5.0,
               ),
               key: ValueKey('Sensor'),
-              title: Text(state.currentActivity,
+              title: Text(state.currentActivity.isNotEmpty ? state.currentActivity : 'Mark current activity',
                   style: TextStyle(
-                    color: Colors.white70,
+                    color: state.currentActivity.isNotEmpty ? Colors.white70 : Colors.white38,
                   )),
               children: List.generate(
                 (state.listActivity.length + 1),
