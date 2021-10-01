@@ -1,6 +1,6 @@
 # smart-jacket
 ## 1. Hardware
-  | <img src="/Hardware/view.png" heigth="200" /> | <img src="/Hardware/assemb_board.jpg" heigth="200" /> |
+  | <img src="/Hardware/view.png" heigth="100" /> | <img src="/Hardware/assemb_board.jpg" heigth="300" /> |
   |----------------------------------------|----------------------------------------|
 
 ## 2. Software
