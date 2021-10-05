@@ -138,7 +138,6 @@ app.layout = html.Div(
                         html.Div(
                             children=[
                                     dcc.RangeSlider(id = 'slider',
-                                                #marks = {i : dates[i] for i in range(count_marks-1)},
                                                 min = 0,
                                                 max = count_marks-1,
                                                 value = [0, count_marks-1],
