@@ -1,41 +1,19 @@
 import dash
 from dash import dcc
 from dash import html
-from dash.dependencies import Output, Input
 from plotly.subplots import make_subplots
 import plotly.graph_objs as go
-import dash,requests,pandas as pd
-from io import StringIO
-import os, sys
-
+import pandas as pd
+import numpy as np
+from dash.dependencies import Output, Input
 from app_functools import calculate_freq, calculate_irreg, calculate_divide, data_peaks
-
-def resource_path(relative):
-    #print(os.environ)
-    application_path = os.path.abspath(".")
-    if getattr(sys, 'frozen', False):
-        # If the application is run as a bundle, the pyInstaller bootloader
-        # extends the sys module by a flag frozen=True and sets the app 
-        # path into variable _MEIPASS'.
-        application_path = sys._MEIPASS
-    #print(application_path)
-    return os.path.join(application_path, relative)
-
-
-external_stylesheets = ['https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css']
-external_scripts = ['https://code.jquery.com/jquery-3.3.1.slim.min.js','https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.bundle.min.js']
-
-app = dash.Dash(__name__,
-                external_stylesheets=external_stylesheets,
-                external_scripts=external_scripts
-                )
 
 
 # Import the dataset
-filepath_st = resource_path('sensordata.csv')
+filepath_st = 'sensordata.csv'
 st = pd.read_csv(filepath_st)
 
-filepath_actv = resource_path('sensordataactivity.csv')
+filepath_actv = 'sensordataactivity.csv'
 act = pd.read_csv(filepath_actv)
 #
 # calulation data
@@ -73,7 +51,12 @@ corporate_colors = {
     'dark-pink-red' : 'rgb(247, 80, 99)',
     'white' : 'rgb(251, 251, 252)',
     'light-grey' : 'rgb(208, 206, 206)',
-    'brown': 'rgb(229, 151, 50)'
+    'brown': 'rgb(229, 151, 50)',
+    'axis-grey': '#e2e2e2',
+    'font-grey': '#606060',
+    'bg-white': '#f9f9f9',
+    'sto-value-blue' : '#3a97e9',
+    'che-value-green' : '#43b582',
 }
 
 # dropdown options
@@ -85,76 +68,120 @@ opts = [{'label' : i, 'value' : i} for i in features]
 std = st['Date'][2:].tolist()
 c = len(std)
 count_marks = int(float(c)//180)
+
 j=0
 dates = []
 for j in range(count_marks):
     dates.append(std[j*180])
 if int(c%180)!=0:
     dates.append(std[c-1])
-    count_marks+=1      
+    count_marks+=1 
+
+
+count_dot = 10         
+len_marks1 = int(float(count_marks)//count_dot)
+Times = {}
+j=0
+for j in range(count_dot):
+    Times.update({int(j*len_marks1): dates[j*len_marks1].strftime("%B %d %H:%M")})   
+if int(count_marks%len_marks1)!=0:
+    Times.update({int(count_marks-1): dates[count_marks-1].strftime("%B %d %H:%M")})   
+    #count_marks+=1      
 # 
 
 # Create a plotly figure for data
 g_opt1, g_opt2 = [opts[0]["value"], opts[1]["value"], opts[2]["value"]],      [opts[5]["value"], opts[6]["value"]]
 init_opts = [g_opt1[0],g_opt1[1], g_opt1[2], g_opt2[0], g_opt2[1]]
 fig = make_subplots(rows=2, cols=1)
-fig.append_trace(go.Scatter(x = st.Date, y = st[che_value],name = che_value,line = dict(width = 2,color = corporate_colors['dark-green'])),1,1)
-fig.append_trace(go.Scatter(x = st.Date, y = st[sto_value],name = sto_value,line = dict(width = 2,color = corporate_colors['dark-blue'])),1,1)
+fig.append_trace(go.Scatter(x = st.Date, y = st[che_value],name = che_value,line = dict(width = 2,color = corporate_colors['che-value-green'])),1,1)
+fig.append_trace(go.Scatter(x = st.Date, y = st[sto_value],name = sto_value,line = dict(width = 2,color = corporate_colors['sto-value-blue'])),1,1)
 fig.append_trace(go.Scatter(x = st_freq_ch.Date, y = st_freq_ch[che_freq],name = che_freq,line = dict(width = 2,color = corporate_colors['medium-green'])),2,1)
 fig.append_trace(go.Scatter(x = st_freq_st.Date, y = st_freq_st[sto_freq],name = sto_freq,line = dict(width = 2,color = corporate_colors['medium-blue'])),2,1)
+fig.update_xaxes(showline=True, linewidth=2, linecolor=corporate_colors['axis-grey'], gridcolor=corporate_colors['axis-grey'])
+fig.update_yaxes(showline=True, linewidth=2, linecolor=corporate_colors['axis-grey'], gridcolor=corporate_colors['axis-grey'])
+fig.update_layout(font_color=corporate_colors['font-grey'], plot_bgcolor = corporate_colors['bg-white'], paper_bgcolor = corporate_colors['bg-white'])
 
 
+external_stylesheets = [
+    {
+        "href": "https://fonts.googleapis.com/css2?"
+        "family=Lato:wght@400;700&display=swap",
+        "rel": "stylesheet",
+    },
+]
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+server = app.server
+app.title = "Breathing Analytics: Understand Your Breathing!"
 
-
-
-# Create a Dash layout
 app.layout = html.Div(
-         children = [
-                # a header and a paragraph
-                html.Div([
-                    html.H1("Data analytics board"),
-                    html.P("")
-                         ],
-                     style = {'padding' : '50px' ,
-                              'backgroundColor' : '#3aaab2'}),
-                # adding a plot
-                html.Div(className='row',
+    children=[
+        html.Div(
+            children=[
+                #html.P(children="health-graph.ico", className="header-emoji"),
+                html.H1(
+                    children="Breathing Analytics", className="header-title"
+                ),
+                html.P(
+                    children="Data analysis of breathing characteristics",
+                    className="header-description",
+                ),
+            ],
+            className="header",
+        ),
+        html.Div(
+            children=[
+                html.Div(
                     children=[
-                # dropdown
-                        html.Div(className='div-for-dropdown',
-                                 children=[
-                                     html.P([
-                    html.Label("Choose a feature"),
-                    dcc.Dropdown(id = 'opt', options = opts,
-                                value = init_opts, multi=True)
-                        ], style = {'width': '240px',
-                                    'fontSize' : '20px',
-                                    'padding-left' : '50px',
-                                    'display': 'inline-block'}),],style = {'padding-top' : '70px'}),
-                    html.Div(className='div-for-chart',
-                     children=[
+                        html.Div(
+                            children="Date Range", className="slider-title"
+                        ),
+                        html.Div(
+                            children=[
+                                    dcc.RangeSlider(id = 'slider',
+                                                #marks = {i : dates[i] for i in range(count_marks-1)},
+                                                min = 0,
+                                                max = count_marks-1,
+                                                value = [0, count_marks-1],
+                                                marks={
+                                                    str(pos): {
+                                                        "label": str(Times.get(pos)),
+                                                        "style": {"color": "#9b9b9b", "width": "9%"},
+                                                    }
+                                                    for pos in Times.keys()
+                                                },
+                                    ),
+                            ],
+                            className="wrapper-slider", 
+                        ),
+                    ],
+                ),
 
-                      html.Div(className='eight columns div-for-charts bg-grey',
-                             children=[
-                          dcc.Graph(id = 'plot', figure = fig),
-                                 ],style = {'width' : '940px'}),            
-                          # range slider
-                          html.P([
-                          html.Label("Time Period"),
-                           dcc.RangeSlider(id = 'slider',
-                                    #marks = {i : dates[i] for i in range(count_marks-1)},
-                                    min = 0,
-                                    max = count_marks-1,
-                                    value = [0, count_marks-1])
-                               ], style = {'width' : '80%',
-                                    'fontSize' : '20px',
-                                    'padding-left' : '100px',
-                                    'display': 'inline-block'}),
-                         ])
-                ]),
-         ]
+                html.Div(
+                    children=[
+                        html.Div(children="Features", className="menu-title"),
+                        html.Div(
+                                children=[dcc.Dropdown(id = 'opt', options = opts,
+                                    value = init_opts, multi=True, style = {'width': '96%'})
+                                ],
+                                className="wrapper-options",  
+                        ),
+                    ],  
+                ),                                             
+                
+            ],
+            className="menu",
+        ),
+        html.Div(
+            children=[
+                html.Div(
+                    children=[dcc.Graph(id = 'plot', figure = fig),],
+                    className="card",
+                ),
+            ],
+            className="wrapper-card",
+        ),
+    ]
 )
-
 
 
 # Add callback functions
@@ -168,9 +195,9 @@ def update_figure(input1, input2):
         if optt in g_opt1:
            st1 = st[(st.Date >= dates[input2[0]]) & (st.Date <= dates[input2[1]])]
            if optt == che_value: 
-              trace1.append(go.Scatter(x = st1.Date, y = st1[optt],name = optt,line = dict(width = 2,color = corporate_colors['dark-green'])))
+              trace1.append(go.Scatter(x = st1.Date, y = st1[optt],name = optt,line = dict(width = 2,color = corporate_colors['che-value-green'])))
            if optt == sto_value: 
-              trace1.append(go.Scatter(x = st1.Date, y = st1[optt],name = optt,line = dict(width = 2,color = corporate_colors['dark-blue']))) 
+              trace1.append(go.Scatter(x = st1.Date, y = st1[optt],name = optt,line = dict(width = 2,color = corporate_colors['sto-value-blue']))) 
         if optt == che_peaks:
            st_pik_ch1 = st_pik_ch[(st_pik_ch.Date >= dates[input2[0]]) & (st_pik_ch.Date <= dates[input2[1]])] 
            trace1.append(go.Scatter(x = st_pik_ch1.Date, y = st_pik_ch1[optt],name = optt,mode='markers',marker=dict(size=6,color = corporate_colors['light-green'],symbol='cross'),))
@@ -217,12 +244,12 @@ def update_figure(input1, input2):
             len1 =len(array1)
             for i in range(len1 - 1):
                 fig.add_vrect(x0=array1[i], x1=array1[i+1], annotation_text=array2[i], annotation_position="bottom left", line_width=0.5)
+    fig.update_xaxes(showline=True, linewidth=2, linecolor=corporate_colors['axis-grey'], gridcolor=corporate_colors['axis-grey'])
+    fig.update_yaxes(showline=True, linewidth=2, linecolor=corporate_colors['axis-grey'], gridcolor=corporate_colors['axis-grey'])
+    fig.update_layout(font_color=corporate_colors['font-grey'], plot_bgcolor = corporate_colors['bg-white'], paper_bgcolor = corporate_colors['bg-white'])
     return fig
 
 
 
-
-
-
-if __name__ == '__main__':
-    app.run_server(host='0.0.0.0', port=8049, debug=False, use_reloader=False)
+if __name__ == "__main__":
+    app.run_server(debug=False)
