@@ -5,6 +5,7 @@ import 'package:flutter_blue/flutter_blue.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:norbusensor/src/features/devices/blocs/bloc_device/device_bloc.dart';
+import 'package:norbusensor/src/config/app_colors.dart';
 
 class ConnectionButtonWidget extends StatelessWidget {
   final connectCubit;
@@ -25,7 +26,7 @@ class ConnectionButtonWidget extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(
                   width: 3,
-                  color: Colors.amber[100],
+                  color: AppColors.blueSkyI,
                 )),
           ),
           Align(
@@ -35,11 +36,11 @@ class ConnectionButtonWidget extends StatelessWidget {
               icon: state.isConnected
                   ? Icon(
                       Icons.link,
-                      color: Colors.amber[100],
+                      color: AppColors.blueSkyI,
                     )
                   : Icon(
                       Icons.link_off,
-                      color: Colors.amber[100],
+                      color: AppColors.blueSkyII,
                     ),
               onPressed: () {
                 connectCubit.add(ToggleConnectionToDevice(device));
@@ -48,7 +49,7 @@ class ConnectionButtonWidget extends StatelessWidget {
                   toastLength: Toast.LENGTH_SHORT,
                   gravity: ToastGravity.BOTTOM,
                   timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.amber[100],
+                  backgroundColor: AppColors.blueSkyII,
                   textColor: Colors.black,
                   fontSize: 16.0,
                 );

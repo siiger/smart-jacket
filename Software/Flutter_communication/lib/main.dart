@@ -7,8 +7,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_hooks_bloc/flutter_hooks_bloc.dart' as fromHooks;
 
 import 'package:norbusensor/src/core/core_providers.dart';
-import 'package:norbusensor/src/core/routes.dart';
-import 'package:norbusensor/src/core/widgets/fade_page_transition_builder.dart';
+import 'package:norbusensor/src/config/routes.dart';
+import 'package:norbusensor/src/config/themes.dart';
 import 'package:norbusensor/src/features/datasensor/data_sensor_screen.dart';
 import 'package:norbusensor/src/features/datasensor/blocs/bloc_data_sensor/data_sensor_bloc.dart';
 
@@ -22,7 +22,7 @@ class App extends StatelessWidget {
     BuildContextX(context).read(sensorBlocProvider).add(InitSensor());
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: metalTheme,
+      theme: kShrineTheme,
       navigatorKey: BuildContextX(context).read(navigatorKeyProvider),
       home: fromHooks.BlocBuilder<DeviceBloc, DeviceState>(
           cubit: BuildContextX(context).read(deviceBlocProvider),
@@ -37,18 +37,3 @@ class App extends StatelessWidget {
     );
   }
 }
-
-final metalTheme = ThemeData.dark().copyWith(
-  appBarTheme: const AppBarTheme(
-    color: Colors.transparent,
-    iconTheme: IconThemeData(color: Colors.amber),
-  ),
-  backgroundColor: Color(0xff363741),
-  accentColor: Color(0xff7c8cff),
-  toggleableActiveColor: Color(0xff7c8cff),
-  dialogBackgroundColor: Color(0xff363741),
-  pageTransitionsTheme: const PageTransitionsTheme(builders: {
-    TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-    TargetPlatform.android: FadePageTransitionsBuilder(),
-  }),
-);

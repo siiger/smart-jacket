@@ -7,6 +7,7 @@ import 'package:norbusensor/src/core/core_providers.dart';
 import 'package:norbusensor/src/features/datasensor/data_sensor_screen.dart';
 
 import 'package:norbusensor/src/features/devices/widgets/connection_button_widget.dart';
+import 'package:norbusensor/src/config/app_colors.dart';
 
 class ScanResultItemWidget extends StatelessWidget {
   final BluetoothDevice scanResultItem;
@@ -30,10 +31,10 @@ class ScanResultItemWidget extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border(
               top: BorderSide(
-                color: Colors.amber[100],
+                color: AppColors.blueSkyI,
               ),
               bottom: BorderSide(
-                color: Colors.amber[100],
+                color: AppColors.blueSkyI,
               ),
             ),
             boxShadow: [

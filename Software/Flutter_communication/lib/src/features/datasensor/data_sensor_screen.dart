@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:oscilloscope/oscilloscope.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_hooks_bloc/flutter_hooks_bloc.dart' as fromHooks;
+import 'package:norbusensor/src/features/datasensor/models/data_sensor_model.dart';
 
 import 'package:norbusensor/src/core/core_providers.dart';
 import 'package:norbusensor/src/features/datasensor/blocs/bloc_data_sensor/data_sensor_bloc.dart';
 import 'package:norbusensor/src/features/devices/widgets/connection_button_widget.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:norbusensor/src/config/app_colors.dart';
+import 'package:norbusensor/src/common_widgets/border_widget.dart';
 
 class DataSensorScreen extends StatelessWidget {
   static const String routeName = '/sensor_page';
@@ -17,7 +21,7 @@ class DataSensorScreen extends StatelessWidget {
       appBar: AppBar(
         leading: Navigator.canPop(context)
             ? IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.amber[100]),
+                icon: Icon(Icons.arrow_back, color: AppColors.white70),
                 onPressed: () => Navigator.of(context).pop(),
               )
             : null,
@@ -51,10 +55,12 @@ class DataSensorScreen extends StatelessWidget {
   }
 }
 
+List<DataSensorModel> dataBr = [];
+
 class _ViewDataPanel extends StatelessWidget {
   final sensorCubit;
-
-  final int deltaData = 360;
+  ChartSeriesController _chartSeriesControllerCh;
+  ChartSeriesController _chartSeriesControllerSt;
 
   _ViewDataPanel(this.sensorCubit);
   @override
@@ -63,20 +69,8 @@ class _ViewDataPanel extends StatelessWidget {
         cubit: BuildContextX(context).read(sensorBlocProvider),
         buildWhen: (previous, current) => (previous.listSensorData != current.listSensorData),
         builder: (context, state) {
-          List<double> dataBrSt = [1000.0];
-          List<double> dataBrCh = [1000.0];
-          int dataLength = state.listSensorData.length;
-          if (dataLength != 0) {
-            if (dataLength <= deltaData) {
-              dataBrSt = state.listSensorData.map((e) => e.stbreath).toList();
-              dataBrCh = state.listSensorData.map((e) => e.chbreath).toList();
-            } else if (dataLength > deltaData) {
-              dataBrSt =
-                  state.listSensorData.getRange(dataLength - deltaData, dataLength).map((e) => e.stbreath).toList();
-              dataBrCh =
-                  state.listSensorData.getRange(dataLength - deltaData, dataLength).map((e) => e.chbreath).toList();
-            }
-          }
+          final _dataSeries = _getChartData(state.listSensorData);
+          /*
           Oscilloscope scopeChest = Oscilloscope(
             showYAxis: true,
             yAxisColor: Colors.orange,
@@ -97,22 +91,60 @@ class _ViewDataPanel extends StatelessWidget {
             yAxisMin: 1600,
             dataSet: dataBrSt,
           );
-
+           */
           return Center(
             child: Column(children: <Widget>[
               Container(
                 width: 360,
-                height: 200,
-                child: scopeChest,
-              ),
-              Container(
-                width: 360,
-                height: 200,
-                child: scopeStom,
+                height: 400,
+                child: SfCartesianChart(
+                  plotAreaBorderWidth: 0,
+                  // Initialize category axis
+                  primaryXAxis: CategoryAxis(isVisible: false),
+                  primaryYAxis: CategoryAxis(isVisible: false),
+                  series: _dataSeries,
+                ),
               ),
             ]),
           );
         });
+  }
+
+  List<AreaSeries<DataSensorModel, DateTime>> _getChartData(List<DataSensorModel> listSensorData) {
+    final int deltaData = 100;
+    int dataLength = listSensorData.length;
+    if (dataLength != 0) {
+      dataBr.add(listSensorData[dataLength - 1]);
+      if (dataLength <= deltaData) {
+        //_chartSeriesControllerCh?.updateDataSource(addedDataIndexes: <int>[dataBr.length - 1]);
+        //_chartSeriesControllerSt?.updateDataSource(addedDataIndexes: <int>[dataBr.length - 1]);
+      } else if (dataLength > deltaData) {
+        dataBr.removeAt(0);
+
+        _chartSeriesControllerCh
+            ?.updateDataSource(addedDataIndexes: <int>[dataBr.length - 1], removedDataIndexes: <int>[0]);
+        _chartSeriesControllerSt
+            ?.updateDataSource(addedDataIndexes: <int>[dataBr.length - 1], removedDataIndexes: <int>[0]);
+      }
+    }
+    return <AreaSeries<DataSensorModel, DateTime>>[
+      AreaSeries<DataSensorModel, DateTime>(
+        onRendererCreated: (ChartSeriesController controller) {
+          _chartSeriesControllerSt = controller;
+        },
+        dataSource: dataBr,
+        xValueMapper: (DataSensorModel dataBr, _) => dataBr.lastTime,
+        yValueMapper: (DataSensorModel dataBr, _) => dataBr.stbreath,
+      ),
+      AreaSeries<DataSensorModel, DateTime>(
+        onRendererCreated: (ChartSeriesController controller) {
+          _chartSeriesControllerCh = controller;
+        },
+        dataSource: dataBr,
+        xValueMapper: (DataSensorModel dataBr, _) => dataBr.lastTime,
+        yValueMapper: (DataSensorModel dataBr, _) => dataBr.chbreath - 300,
+      ),
+    ];
   }
 }
 
@@ -131,21 +163,23 @@ class _MarkActivityField extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border(
               top: BorderSide(
-                color: Colors.amber[100],
+                color: AppColors.blueSkyI,
+                width: 2.5,
               ),
               bottom: BorderSide(
-                color: Colors.amber[100],
+                color: AppColors.blueSkyI,
+                width: 3.0,
               ),
             ),
           ),
           child: ListTileTheme(
-            textColor: Colors.white,
-            tileColor: Colors.transparent,
-            iconColor: Colors.amber[100],
+            textColor: AppColors.blueGrey,
+            tileColor: AppColors.latoGrey,
+            iconColor: AppColors.blueSkyI,
             child: ExpansionTile(
-              collapsedIconColor: Colors.amber[100],
-              iconColor: Colors.amber[100],
-              backgroundColor: Colors.transparent,
+              collapsedIconColor: AppColors.blueSkyI,
+              iconColor: AppColors.blueSkyI,
+              backgroundColor: AppColors.latoGrey,
               childrenPadding: const EdgeInsets.only(
                 left: 5.0,
                 right: 5.0,
@@ -153,14 +187,16 @@ class _MarkActivityField extends StatelessWidget {
               key: ValueKey('Sensor'),
               title: Text(state.currentActivity.isNotEmpty ? state.currentActivity : 'Mark current activity',
                   style: TextStyle(
-                    color: state.currentActivity.isNotEmpty ? Colors.white70 : Colors.white38,
+                    color: state.currentActivity.isNotEmpty ? AppColors.blueGrey : AppColors.grey,
                   )),
               children: List.generate(
                 (state.listActivity.length + 1),
                 (index) {
                   if (index < state.listActivity.length) {
                     return Card(
-                        color: Color(0x24ffffff),
+                        color: AppColors.white80,
+                        shadowColor: AppColors.blueSkyI,
+                        elevation: 3.0,
                         child: Row(
                             key: ValueKey('Sensor' + index.toString()),
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -175,7 +211,7 @@ class _MarkActivityField extends StatelessWidget {
                                       bottom: 15.0,
                                     ),
                                     child: Text(state.listActivity.elementAt(index).toString(),
-                                        style: TextStyle(color: Colors.white70), overflow: TextOverflow.ellipsis),
+                                        style: TextStyle(color: AppColors.blueGrey), overflow: TextOverflow.ellipsis),
                                   ),
                                   onTap: () {
                                     sensorCubit.add(ChooseActivity(index: index));
@@ -183,7 +219,7 @@ class _MarkActivityField extends StatelessWidget {
                                 ),
                               ),
                               IconButton(
-                                icon: Icon(Icons.delete, color: Colors.amber[100]),
+                                icon: Icon(Icons.delete, color: AppColors.blueSkyI),
                                 onPressed: () {
                                   sensorCubit.add(DeleteActivityFromList(index: index));
                                 },
@@ -203,7 +239,7 @@ class _MarkActivityField extends StatelessWidget {
                             child: Expanded(
                               child: TextFormField(
                                 decoration: InputDecoration(
-                                  labelText: "Type new activity",
+                                  labelText: "Add new activity",
                                   //icon: Icon(Icons.face),
                                 ),
                                 //validator: (val) {},
@@ -214,7 +250,7 @@ class _MarkActivityField extends StatelessWidget {
                             ),
                           ),
                           IconButton(
-                            icon: Icon(Icons.add, color: Colors.amber[100]),
+                            icon: Icon(Icons.add, color: AppColors.blueSkyI),
                             onPressed: () {
                               _formKey.currentState.save();
                             },
@@ -243,10 +279,21 @@ class _RealTimeButton extends StatelessWidget {
       buildWhen: (previous, current) => previous.isRealTimeMode != current.isRealTimeMode,
       builder: (context, state) {
         return IconButton(
-          iconSize: 35.0,
+          iconSize: 55.0,
           icon: state.isRealTimeMode
-              ? Icon(Icons.stop_circle_outlined, color: Colors.red[200])
-              : Icon(Icons.play_circle, color: Colors.amber[100]),
+              ? BorderWidget(
+                  child: Icon(
+                  Icons.stop_circle_outlined,
+                  color: Colors.red[200],
+                  size: 35.0,
+                ))
+              : BorderWidget(
+                  child: Icon(
+                    Icons.play_circle,
+                    size: 35.0,
+                    color: AppColors.blueSkyI,
+                  ),
+                ),
           onPressed: () {
             sensorCubit.add(ToggleRealTimeDataAccess());
             Fluttertoast.showToast(
@@ -254,7 +301,7 @@ class _RealTimeButton extends StatelessWidget {
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.BOTTOM,
               timeInSecForIosWeb: 1,
-              backgroundColor: Colors.amber[100],
+              backgroundColor: AppColors.blueSkyI,
               textColor: Colors.black,
               fontSize: 16.0,
             );
@@ -275,10 +322,22 @@ class _RecToMemoryButton extends StatelessWidget {
       buildWhen: (previous, current) => previous.isRecToMemoryMode != current.isRecToMemoryMode,
       builder: (context, state) {
         return IconButton(
-          iconSize: 35.0,
+          iconSize: 55.0,
           icon: state.isRecToMemoryMode
-              ? Icon(Icons.stop_circle_outlined, color: Colors.red[200])
-              : Icon(Icons.radio_button_checked, color: Colors.amber[100]),
+              ? BorderWidget(
+                  child: Icon(
+                    Icons.stop_circle_outlined,
+                    color: Colors.red[200],
+                    size: 35.0,
+                  ),
+                  borderColor: Colors.red[200],
+                )
+              : BorderWidget(
+                  child: Icon(
+                  Icons.radio_button_checked,
+                  size: 35.0,
+                  color: AppColors.blueSkyI,
+                )),
           onPressed: () {
             sensorCubit.add(ToggleRecDataToMemory());
             Fluttertoast.showToast(
@@ -286,7 +345,7 @@ class _RecToMemoryButton extends StatelessWidget {
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.BOTTOM,
               timeInSecForIosWeb: 1,
-              backgroundColor: Colors.amber[100],
+              backgroundColor: AppColors.blueSkyI,
               textColor: Colors.black,
               fontSize: 16.0,
             );
@@ -303,8 +362,14 @@ class _ReadFromMemoryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      iconSize: 35.0,
-      icon: Icon(Icons.download_for_offline, color: Colors.amber[100]),
+      iconSize: 55.0,
+      icon: BorderWidget(
+        child: Icon(
+          Icons.download_for_offline,
+          size: 35.0,
+          color: AppColors.blueSkyI,
+        ),
+      ),
       onPressed: () {
         sensorCubit.add(ReadDataFromMemory());
         Fluttertoast.showToast(
@@ -312,7 +377,7 @@ class _ReadFromMemoryButton extends StatelessWidget {
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
-          backgroundColor: Colors.amber[100],
+          backgroundColor: AppColors.blueSkyI,
           textColor: Colors.black,
           fontSize: 16.0,
         );
@@ -327,8 +392,14 @@ class _SaveDataToLocalPathButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      iconSize: 35.0,
-      icon: Icon(Icons.save, color: Colors.amber[100]),
+      iconSize: 55.0,
+      icon: BorderWidget(
+        child: Icon(
+          Icons.save,
+          size: 35.0,
+          color: AppColors.blueSkyI,
+        ),
+      ),
       onPressed: () {
         sensorCubit.add(SaveDataToLocalPath());
         Fluttertoast.showToast(
@@ -336,7 +407,7 @@ class _SaveDataToLocalPathButton extends StatelessWidget {
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,
-            backgroundColor: Colors.amber[100],
+            backgroundColor: AppColors.blueSkyI,
             textColor: Colors.black,
             fontSize: 16.0);
       },

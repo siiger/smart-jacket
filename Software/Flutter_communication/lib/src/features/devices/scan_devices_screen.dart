@@ -6,6 +6,7 @@ import 'package:norbusensor/src/core/core_providers.dart';
 import 'package:norbusensor/src/features/devices/widgets/scan_result_item_widget.dart';
 import 'package:norbusensor/src/features/devices/blocs/bloc_device/device_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:norbusensor/src/config/app_colors.dart';
 
 class ScanDevicesScreen extends StatelessWidget {
   @override
@@ -62,15 +63,15 @@ class _ScanButton extends StatelessWidget {
               height: 35.0,
               decoration: new BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(width: 3, color: state.isScanning ? Colors.amber[100] : Colors.amber[100])),
+                  border: Border.all(width: 3, color: state.isScanning ? AppColors.white : AppColors.white90)),
             ),
             Align(
               alignment: Alignment.center,
               child: IconButton(
                 iconSize: 30.0,
                 icon: state.isScanning
-                    ? Icon(Icons.wifi_tethering, color: Colors.amber[100])
-                    : Icon(Icons.wifi_tethering_off, color: Colors.amber[100]),
+                    ? Icon(Icons.wifi_tethering, color: AppColors.white)
+                    : Icon(Icons.wifi_tethering_off, color: AppColors.white80),
                 onPressed: () {
                   scanCubit.add(ToggleScanForDevices());
                   Fluttertoast.showToast(
@@ -78,7 +79,7 @@ class _ScanButton extends StatelessWidget {
                     toastLength: Toast.LENGTH_SHORT,
                     gravity: ToastGravity.BOTTOM,
                     timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.amber[100],
+                    backgroundColor: AppColors.blueSkyII,
                     textColor: Colors.black,
                     fontSize: 16.0,
                   );
