@@ -11,4 +11,5 @@
 
   
   Dash analytics
-   ![dash_data_analit](https://user-images.githubusercontent.com/73643145/136027669-c8859045-085c-4967-882e-190111af3acc.gif)
+   |![dash_data_analit](https://user-images.githubusercontent.com/73643145/136027669-c8859045-085c-4967-882e-190111af3acc.gif)|
+   |----------------------------------------|
