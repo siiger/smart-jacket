@@ -5,8 +5,8 @@
 
 ## 2. Software
   Flutter communication
-   |![flutter_sensor_com](https://user-images.githubusercontent.com/73643145/136924515-f65f8352-eae1-4712-b7b4-9862755d9dff.gif)||
-   |----------------------------------------|----------------------------------------|
+   <img src= "https://user-images.githubusercontent.com/73643145/136924515-f65f8352-eae1-4712-b7b4-9862755d9dff.gif" />
+  
 
   
   Dash analytics
