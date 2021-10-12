@@ -5,8 +5,11 @@
 
 ## 2. Software
   Flutter communication
-   | ![Communication](/Software/Flutter_communication/screenshot/Screenshot_Search_screen.jpg)  | ![Communication](/Software/Flutter_communication/screenshot/Screenshot_Mark_activity.jpg)  | ![Communication](/Software/Flutter_communication/screenshot/Screenshot_Data_flow.jpg)|
-   |----------------------------------------|----------------------------------------|----------------------------------------|
+  |<img src= "https://user-images.githubusercontent.com/73643145/136924515-f65f8352-eae1-4712-b7b4-9862755d9dff.gif"  width="320"/>|
+  |----------------------------------------|
+  
+
   
   Dash analytics
-   ![dash_data_analit](https://user-images.githubusercontent.com/73643145/136027669-c8859045-085c-4967-882e-190111af3acc.gif)
+   |![dash_data_analit](https://user-images.githubusercontent.com/73643145/136027669-c8859045-085c-4967-882e-190111af3acc.gif)|
+   |----------------------------------------|
