@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:norbusensor/src/config/app_colors.dart';
 
 class ListViewBigSeparatorWidget extends StatelessWidget {
   @override
@@ -13,7 +14,7 @@ class ListViewBigSeparatorWidget extends StatelessWidget {
 }
 
 class ListViewSeparatorWidget extends StatelessWidget {
-  const ListViewSeparatorWidget({this.padding = const EdgeInsets.symmetric(horizontal: 16.0), Key key})
+  const ListViewSeparatorWidget({this.padding = const EdgeInsets.symmetric(horizontal: 6.0), Key key})
       : super(key: key);
 
   final EdgeInsetsGeometry padding;
@@ -22,8 +23,9 @@ class ListViewSeparatorWidget extends StatelessWidget {
     return Padding(
       padding: padding,
       child: Divider(
-        color: Colors.white.withOpacity(.12),
+        color: AppColors.blueSkyI,
         height: 2.0,
+        thickness: 2.0,
       ),
     );
   }

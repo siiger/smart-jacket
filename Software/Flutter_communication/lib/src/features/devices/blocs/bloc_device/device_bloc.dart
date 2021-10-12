@@ -5,6 +5,7 @@ import 'package:meta/meta.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:norbusensor/src/core/constants.dart';
+import 'package:norbusensor/src/core/utils/show_message.dart';
 
 part 'device_event.dart';
 part 'device_state.dart';
@@ -61,6 +62,7 @@ class DeviceBloc extends Bloc<DeviceEvent, DeviceState> {
   Stream<DeviceState> _mapToggleScanForDevicesToState(DeviceState state, ToggleScanForDevices event) async* {
     if (!state.isScanning) {
       yield state.copyWith(isScanning: true);
+      showMessage("Scanning");
       scanSubscription?.cancel();
       scanSubscription = _flutterBlue.scan().listen((ScanResult result) {
         if (result.device.name == Constants.NAME_DEVICE) {
@@ -71,6 +73,7 @@ class DeviceBloc extends Bloc<DeviceEvent, DeviceState> {
       await _flutterBlue.stopScan();
       scanSubscription?.cancel();
       yield state.copyWith(isScanning: false);
+      showMessage("Stop");
     }
   }
 
@@ -87,9 +90,11 @@ class DeviceBloc extends Bloc<DeviceEvent, DeviceState> {
     if (!state.isConnected) {
       await event.device.connect();
       yield state.copyWith(isConnected: true);
+      showMessage("Connected");
     } else {
       await event.device.disconnect();
       yield state.copyWith(isConnected: false);
+      showMessage("Disconnect");
     }
   }
 

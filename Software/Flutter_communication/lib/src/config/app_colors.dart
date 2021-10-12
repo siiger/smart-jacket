@@ -9,9 +9,17 @@ class AppColors {
 
   static const Color latoGrey = Color(0xffdfe1e1);
   static const Color latoGrey1 = Color(0xffc3c5c5);
+  static const Color latoGrey2 = Color(0xffecefef);
   static const Color blueSkyI = Color(0xff1d77b4);
   static const Color blueSkyII = Color(0xff96bad2);
   static const Color blueSkyIII = Color(0xff0b476f);
+  static const Color blueSkyIV = Color(0xff186295);
+  static const Color blueSkyV = Color(0xff3c99ea);
+  static const Color blueSkyVI = Color(0xffaee0fd);
+  static const Color green = Color(0xff45b583);
+  static const Color greenDark = Color(0xff066612);
+  static const Color red = Color(0xffe77271);
+  static const Color greenLight = Color(0xffc7e7c8);
 
   static const Color white = Color(0xffffffff);
   static const Color white90 = Color(0xe6ffffff);
@@ -31,6 +39,8 @@ class AppColors {
   static const Color white15 = Color(0x24ffffff);
 
   static const Color grey = Color(0xffaaaaaa);
+  static const Color grey1 = Color(0xff848585);
+  static const Color grey2 = Color(0xff4e4e4e);
   static const Color darkGrey = Color(0xff1a1c24);
   static const Color darkGrey1 = Color(0xff0d0e13);
   static const Color darkGrey2 = Color(0xff20212a);
@@ -39,42 +49,30 @@ class AppColors {
   static const Color blueGrey = Color(0xff282a33);
   static const Color blueGreyLight = Color(0xff363741);
 
-  static const Color lightBlue = Color(0xff7c8cff);
-  static const Color lightBlue20 = Color(0x337c8cff);
-  static const Color lightBlue55 = Color(0x8c7c8cff);
-  static const Color lightBlue70 = Color(0xb37c8cff);
-  static const Color lightBlue3 = Color(0xff5c72e4);
-  static const Color purple = Color(0xff7c4dff);
-  static const Color purple2 = Color(0xff705cf5);
-  static const Color purple3 = Color(0xff8c4be7);
-  static const Color purple4 = Color(0xff5539a7);
-  static const Color purple5 = Color(0xff4B00A3);
-  static const Color blueSky = Color(0xff044f99);
-  static const Color blueSky30 = Color(0x4d044f99);
-  static const Color blueSky90 = Color(0xe6044f99);
-  static const Color blueSky3 = Color(0xff1e7ec4);
-  static const Color blueSky5 = Color(0xff029fcf);
-  static const Color blueSky6 = Color(0xff045e79);
-  static const Color blueSunset = Color(0xff3b168a);
-  static const Color blueSunset0 = Color(0x003b168a);
-  static const Color blueSunset40 = Color(0x663b168a);
-  static const Color blueNight = Color(0xff1a1a49);
-  static const Color blueNight2 = Color(0xff23195a);
-  static const Color blueNight3 = Color(0xff191949);
-  static const Color blueNight4 = Color(0xff1F0062);
+  static LinearGradient get gradientColorsGreen {
+    final List<Color> listColorGreen = <Color>[];
+    listColorGreen.add(latoGrey);
+    listColorGreen.add(Colors.green[200]);
+    listColorGreen.add(Colors.green[400]);
+    final List<double> stops = <double>[];
+    stops.add(0.0);
+    stops.add(0.8);
+    stops.add(1.0);
+    return LinearGradient(
+        begin: Alignment.bottomCenter, end: Alignment.topCenter, colors: listColorGreen, stops: stops);
+  }
 
-  static const Color blueSkyLight = Color(0xff0dc8ff);
-  static const Color blueSkyLight2 = Color(0xff00e5ff);
-  static const Color blueSkyLight3 = Color(0xffa4d1f7);
-
-  static const Color yellow = Color(0xfff9e484);
-
-  static const Color green = Color(0xff43cf83);
-  static const Color green2 = Color(0xff00e596);
-  static const Color green3 = Color(0xff35e786);
-  static const Color green4 = Color(0xff10BF58);
-  static const Color glowGreen = Color(0xff099198);
-  static const Color glowGreen2 = Color(0xff2bb1b8);
-
-  static const Color magentaLight = Color(0xffffbdee);
+  static LinearGradient get gradientColorsBlue {
+    final List<Color> listColorBlue = <Color>[];
+    listColorBlue.add(latoGrey);
+    listColorBlue.add(latoGrey);
+    listColorBlue.add(Colors.blue[100]);
+    listColorBlue.add(Colors.blue[400]);
+    final List<double> stops = <double>[];
+    stops.add(0.0);
+    stops.add(0.7);
+    stops.add(0.9);
+    stops.add(1.0);
+    return LinearGradient(begin: Alignment.bottomCenter, end: Alignment.topCenter, colors: listColorBlue, stops: stops);
+  }
 }

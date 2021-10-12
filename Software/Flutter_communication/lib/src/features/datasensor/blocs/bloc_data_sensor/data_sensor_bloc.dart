@@ -7,12 +7,17 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:norbusensor/src/features/devices/blocs/bloc_device/device_bloc.dart';
 import 'package:norbusensor/src/features/datasensor/models/data_sensor_model.dart';
 import 'package:norbusensor/src/core/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:norbusensor/src/config/app_colors.dart';
+import 'package:norbusensor/src/core/utils/show_message.dart';
+
 part 'data_sensor_event.dart';
 part 'data_sensor_state.dart';
 
@@ -30,6 +35,12 @@ class DataSensorBloc extends Bloc<SensorEvent, DataSensorState> {
   StreamSubscription _receiveDataSubscription;
   SharedPreferences preferences;
   int saveDataStartIndex;
+
+  //redraw the series controllers
+  ChartSeriesController _chartSeriesControllerCh;
+  ChartSeriesController _chartSeriesControllerSt;
+  final int _deltaChartData = 100;
+  List<DataSensorModel> _dataBr = [];
 
   @override
   Stream<DataSensorState> mapEventToState(
@@ -114,9 +125,11 @@ class DataSensorBloc extends Bloc<SensorEvent, DataSensorState> {
         Uint8List bytes = Uint8List.fromList(data);
         await state.cRX.write(bytes, withoutResponse: true);
         yield state.copyWith(isRecToMemoryMode: true);
+        showMessage("Record");
       } else {
         await state.cRX.write([Constants.CMD_STOP], withoutResponse: true);
         yield state.copyWith(isRecToMemoryMode: false);
+        showMessage("Stop");
       }
     }
   }
@@ -172,6 +185,7 @@ class DataSensorBloc extends Bloc<SensorEvent, DataSensorState> {
           }
         }
       });
+      showMessage("Reading data");
     }
   }
 
@@ -186,6 +200,7 @@ class DataSensorBloc extends Bloc<SensorEvent, DataSensorState> {
             final res = await state.cRX.read();
             if (res.length != null) print("OK");
             yield state.copyWith(isRealTimeMode: true);
+            showMessage("Run");
           } catch (e) {
             print(e);
           }
@@ -211,6 +226,7 @@ class DataSensorBloc extends Bloc<SensorEvent, DataSensorState> {
         _receiveDataSubscription?.cancel();
         await state.cRX.write([Constants.CMD_STOP], withoutResponse: true);
         yield state.copyWith(isRealTimeMode: false);
+        showMessage("Stop");
       }
     }
   }
@@ -219,8 +235,20 @@ class DataSensorBloc extends Bloc<SensorEvent, DataSensorState> {
     List<DataSensorModel> listScanUp = [];
     listScanUp.addAll(state.listSensorData);
     listScanUp.add(event.sensorData);
+
+    _dataBr.add(event.sensorData);
+    if (_dataBr.length == _deltaChartData) {
+      _dataBr.removeAt(0);
+
+      _chartSeriesControllerCh
+          ?.updateDataSource(addedDataIndexes: <int>[_dataBr.length - 1], removedDataIndexes: <int>[0]);
+      _chartSeriesControllerSt
+          ?.updateDataSource(addedDataIndexes: <int>[_dataBr.length - 1], removedDataIndexes: <int>[0]);
+    } else {
+      _chartSeriesControllerCh?.updateDataSource(addedDataIndexes: <int>[_dataBr.length - 1]);
+      _chartSeriesControllerSt?.updateDataSource(addedDataIndexes: <int>[_dataBr.length - 1]);
+    }
     yield state.copyWith(listSensorData: listScanUp);
-    //yield state.copyWith(listSensorData: state.listSensorData..addAll([event.sensorData]));
   }
 
   Stream<DataSensorState> _mapAddActivityToListToState(DataSensorState state, AddActivityToList event) async* {
@@ -254,6 +282,7 @@ class DataSensorBloc extends Bloc<SensorEvent, DataSensorState> {
 
   Stream<DataSensorState> _mapSaveDataToLocalPathToState(DataSensorState state) async* {
     if (!state.isRealTimeMode || !state.isRecToMemoryMode) {
+      final path = await _localPath;
       final file = await _localFileData;
       int saveDataEndIndex = state.listSensorData.length;
       String data = '';
@@ -268,7 +297,39 @@ class DataSensorBloc extends Bloc<SensorEvent, DataSensorState> {
       }
       await file.writeAsString(data, mode: FileMode.append);
       saveDataStartIndex = saveDataEndIndex;
+      showMessage("Saving data to: ${path}", toastLen: Toast.LENGTH_LONG);
     }
+  }
+
+  List<AreaSeries<DataSensorModel, DateTime>> getAreaSeries() {
+    return <AreaSeries<DataSensorModel, DateTime>>[
+      AreaSeries<DataSensorModel, DateTime>(
+        onRendererCreated: (ChartSeriesController controller) {
+          _chartSeriesControllerSt = controller;
+        },
+        dataSource: _dataBr,
+        xValueMapper: (DataSensorModel dataBr, _) => dataBr.lastTime,
+        yValueMapper: (DataSensorModel dataBr, _) => dataBr.stbreath,
+        animationDuration: 0,
+        color: AppColors.latoGrey2,
+        borderColor: AppColors.blueSkyI,
+        borderWidth: 4,
+        //gradient: AppColors.gradientColorsBlue,
+      ),
+      AreaSeries<DataSensorModel, DateTime>(
+        onRendererCreated: (ChartSeriesController controller) {
+          _chartSeriesControllerCh = controller;
+        },
+        dataSource: _dataBr,
+        xValueMapper: (DataSensorModel dataBr, _) => dataBr.lastTime,
+        yValueMapper: (DataSensorModel dataBr, _) => dataBr.chbreath + 50,
+        //gradient: AppColors.gradientColorsGreen,
+        animationDuration: 0,
+        color: AppColors.latoGrey2,
+        borderColor: AppColors.green,
+        borderWidth: 4,
+      ),
+    ];
   }
 
   Future<String> get _localPath async {

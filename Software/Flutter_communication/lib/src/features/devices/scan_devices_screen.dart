@@ -5,8 +5,8 @@ import 'package:flutter_hooks_bloc/flutter_hooks_bloc.dart' as fromHooks;
 import 'package:norbusensor/src/core/core_providers.dart';
 import 'package:norbusensor/src/features/devices/widgets/scan_result_item_widget.dart';
 import 'package:norbusensor/src/features/devices/blocs/bloc_device/device_bloc.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:norbusensor/src/config/app_colors.dart';
+import 'package:norbusensor/src/common_widgets/border_widget.dart';
 
 class ScanDevicesScreen extends StatelessWidget {
   @override
@@ -15,7 +15,7 @@ class ScanDevicesScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Searching Devices',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(color: AppColors.white80),
         ),
         actions: <Widget>[
           _ScanButton(BuildContextX(context).read(deviceBlocProvider)),
@@ -26,7 +26,7 @@ class ScanDevicesScreen extends StatelessWidget {
           buildWhen: (previous, current) => (previous.listScan != current.listScan),
           builder: (context, state) {
             return state.listScan == null
-                ? Container()
+                ? SizedBox.shrink()
                 : ListView.separated(
                     padding: EdgeInsets.symmetric(vertical: 15),
                     scrollDirection: Axis.vertical,
@@ -54,39 +54,34 @@ class _ScanButton extends StatelessWidget {
       cubit: scanCubit,
       buildWhen: (previous, current) => previous.isScanning != current.isScanning,
       builder: (context, state) {
-        return Stack(
-          alignment: Alignment.center,
-          children: <Widget>[
-            Container(
-              alignment: Alignment.center,
-              width: 35.0,
-              height: 35.0,
-              decoration: new BoxDecoration(
+        return IconButton(
+          iconSize: 35.0,
+          icon: state.isScanning
+              ? BorderWidget(
                   shape: BoxShape.circle,
-                  border: Border.all(width: 3, color: state.isScanning ? AppColors.white : AppColors.white90)),
-            ),
-            Align(
-              alignment: Alignment.center,
-              child: IconButton(
-                iconSize: 30.0,
-                icon: state.isScanning
-                    ? Icon(Icons.wifi_tethering, color: AppColors.white)
-                    : Icon(Icons.wifi_tethering_off, color: AppColors.white80),
-                onPressed: () {
-                  scanCubit.add(ToggleScanForDevices());
-                  Fluttertoast.showToast(
-                    msg: state.isScanning ? "Stop" : "Scanning",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.BOTTOM,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: AppColors.blueSkyII,
-                    textColor: Colors.black,
-                    fontSize: 16.0,
-                  );
-                },
-              ),
-            ),
-          ],
+                  widthOut: 35.0,
+                  heightOut: 35.0,
+                  borderColor: AppColors.white,
+                  baseColor: AppColors.blueSkyI,
+                  child: Icon(
+                    Icons.wifi_tethering,
+                    color: AppColors.white,
+                    size: 30.0,
+                  ))
+              : BorderWidget(
+                  shape: BoxShape.circle,
+                  widthOut: 35.0,
+                  heightOut: 35.0,
+                  borderColor: AppColors.white80,
+                  baseColor: AppColors.blueSkyI,
+                  child: Icon(
+                    Icons.wifi_tethering_off,
+                    color: AppColors.white80,
+                    size: 30.0,
+                  )),
+          onPressed: () {
+            scanCubit.add(ToggleScanForDevices());
+          },
         );
       },
     );
