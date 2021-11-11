@@ -10,10 +10,10 @@ from app_functools import calculate_freq, calculate_irreg, calculate_divide, dat
 
 
 # Import the dataset
-filepath_st = 'sensordata.csv'
+filepath_st = '/data/sensordata.csv'
 st = pd.read_csv(filepath_st)
 
-filepath_actv = 'sensordataactivity.csv'
+filepath_actv = '/data/sensordataactivity.csv'
 act = pd.read_csv(filepath_actv)
 #
 # calulation data
