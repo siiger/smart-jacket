@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:norbusensor/src/features/datasensor/widgets/item_activity_widget.dart';
+import 'package:norbusensor/src/features/datasensor/widgets/new_item_activity_widget.dart';
 import 'package:norbusensor/src/features/devices/blocs/bloc_device/device_bloc.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -109,9 +111,9 @@ class _ViewDataPanel extends StatelessWidget {
 }
 
 class _MarkActivityField extends StatelessWidget {
-  final sensorCubit;
   _MarkActivityField(this.sensorCubit);
-  final _formKey = GlobalKey<FormState>();
+  final sensorCubit;
+
   @override
   Widget build(BuildContext context) {
     return fromHooks.BlocBuilder<DataSensorBloc, DataSensorState>(
@@ -156,122 +158,16 @@ class _MarkActivityField extends StatelessWidget {
                   if (index == 0) {
                     return ListViewSeparatorWidget(padding: EdgeInsets.only(left: 6.0, right: 6.0, bottom: 6.0));
                   } else if (index <= state.listActivity.length) {
-                    return BorderWidget(
-                        heightOut: 46,
-                        widthLine: 1.9,
-                        widthOut: null,
-                        hasShadow: false,
-                        child: Row(
-                            key: ValueKey('Sensor' + index.toString()),
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Container(
-                                width: 270,
-                                height: 35,
-                                child: ListTile(
-                                  tileColor: Colors.transparent,
-                                  title: Padding(
-                                    padding: const EdgeInsets.only(
-                                      bottom: 15.0,
-                                    ),
-                                    child: Text(state.listActivity.elementAt(index - 1).toString(),
-                                        style: TextStyle(fontSize: 18.0, color: AppColors.grey2),
-                                        overflow: TextOverflow.ellipsis),
-                                  ),
-                                  onTap: () {
-                                    sensorCubit.add(ChooseActivity(index: index - 1));
-                                  },
-                                ),
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: <Widget>[
-                                  Container(
-                                    width: 1,
-                                    height: 26,
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        left: BorderSide(
-                                          color: AppColors.blueSkyI,
-                                          width: 1.9,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.clear_outlined, color: AppColors.blueSkyI),
-                                    onPressed: () {
-                                      sensorCubit.add(DeleteActivityFromList(index: index - 1));
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ]));
+                    return ItemActivityWidget(
+                      key: ValueKey('Sensor' + index.toString()),
+                      text: state.listActivity.elementAt(index - 1).toString(),
+                      onTap: () => sensorCubit.add(ChooseActivity(index: index - 1)),
+                      onPressedIcon: () => sensorCubit.add(DeleteActivityFromList(index: index - 1)),
+                    );
                   } else {
-                    return Padding(
-                      padding: const EdgeInsets.only(
-                        right: 0.0,
-                      ),
-                      child: BorderWidget(
-                        heightOut: 46,
-                        widthLine: 1.9,
-                        widthOut: null,
-                        hasShadow: false,
-                        baseColor: AppColors.latoGrey,
-                        child: Row(
-                          key: ValueKey('Sensor' + index.toString()),
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: <Widget>[
-                            Form(
-                              key: _formKey,
-                              child: Expanded(
-                                child: TextFormField(
-                                  style: TextStyle(fontSize: 18.0, color: AppColors.grey2),
-                                  decoration: InputDecoration(
-                                    hintText: "Add new activity",
-                                    hintStyle: TextStyle(
-                                      fontSize: 18.0,
-                                      color: AppColors.grey1,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderSide: BorderSide.none,
-                                      borderRadius: BorderRadius.all(Radius.circular(16.0)),
-                                    ),
-                                    //icon: Icon(Icons.face),
-                                  ),
-                                  //validator: (val) {},
-                                  controller: TextEditingController()..text = '',
-                                  onSaved: (value) => sensorCubit.add(AddActivityToList(mark: value)),
-                                  //maxLength: 1,
-                                ),
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
-                                Container(
-                                  width: 1,
-                                  height: 26,
-                                  decoration: BoxDecoration(
-                                    border: Border(
-                                      left: BorderSide(
-                                        color: AppColors.blueSkyI,
-                                        width: 1.9,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.add, color: AppColors.blueSkyI),
-                                  onPressed: () {
-                                    _formKey.currentState.save();
-                                  },
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
+                    return NewItemActivityWidget(
+                      key: ValueKey('Sensor' + index.toString()),
+                      onSavedValue: (value) => sensorCubit.add(AddActivityToList(mark: value)),
                     );
                   }
                 },
