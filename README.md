@@ -1,5 +1,8 @@
 # smart-jacket
 ## 1. Hardware
+
+The hardware design of this device is based on microcontroller STM32WBCCU6. This microcontroller was chosen because  it  has two separate cores on common crystal, one of which serves Bluetooth Low Energy and other core  has an ADC converter with sufficient performance for current task.
+
   | <img src="/Hardware/view.png" width="200" /> | <img src="/Hardware/assemb_board.jpg" width="200" /> | <img src="/Hardware/back_side.png" width="200" /> |
   |----------------------------------------|----------------------------------------|----------------------------------------|
  
