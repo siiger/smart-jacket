@@ -11,6 +11,7 @@ import 'package:norbusensor/src/common_widgets/border_widget.dart';
 class ScanDevicesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final DeviceBloc deviceBloc = BuildContextX(context).read(deviceBlocProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -18,11 +19,11 @@ class ScanDevicesScreen extends StatelessWidget {
           style: TextStyle(color: AppColors.white80),
         ),
         actions: <Widget>[
-          _ScanButton(BuildContextX(context).read(deviceBlocProvider)),
+          _ScanButton(deviceBloc),
         ],
       ),
       body: fromHooks.BlocBuilder<DeviceBloc, DeviceState>(
-          cubit: BuildContextX(context).read(deviceBlocProvider),
+          cubit: deviceBloc,
           buildWhen: (previous, current) => (previous.listScan != current.listScan),
           builder: (context, state) {
             return state.listScan == null

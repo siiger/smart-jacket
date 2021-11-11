@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:norbusensor/src/features/devices/blocs/bloc_device/device_bloc.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_hooks_bloc/flutter_hooks_bloc.dart' as fromHooks;
@@ -16,6 +17,9 @@ class DataSensorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final DeviceBloc deviceBloc = BuildContextX(context).read(deviceBlocProvider);
+    final DataSensorBloc sensorCubit = BuildContextX(context).read(sensorBlocProvider);
+
     return Scaffold(
       appBar: AppBar(
         leading: Navigator.canPop(context)
@@ -30,8 +34,8 @@ class DataSensorScreen extends StatelessWidget {
         ),
         actions: <Widget>[
           ConnectionButtonWidget(
-            connectCubit: BuildContextX(context).read(deviceBlocProvider),
-            device: BuildContextX(context).read(deviceBlocProvider).state.device,
+            connectCubit: deviceBloc,
+            device: deviceBloc.state.device,
             activColor: AppColors.white,
             deactivColor: AppColors.white70,
           ),
@@ -43,18 +47,18 @@ class DataSensorScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.only(top: 15.0, bottom: 15.0),
               child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: <Widget>[
-                _RealTimeButton(BuildContextX(context).read(sensorBlocProvider)),
-                _RecToMemoryButton(BuildContextX(context).read(sensorBlocProvider)),
-                _ReadFromMemoryButton(BuildContextX(context).read(sensorBlocProvider)),
-                _SaveDataToLocalPathButton(BuildContextX(context).read(sensorBlocProvider)),
+                _RealTimeButton(sensorCubit),
+                _RecToMemoryButton(sensorCubit),
+                _ReadFromMemoryButton(sensorCubit),
+                _SaveDataToLocalPathButton(sensorCubit),
               ]),
             ),
             Stack(children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(top: 60.0),
-                child: _ViewDataPanel(BuildContextX(context).read(sensorBlocProvider)),
+                child: _ViewDataPanel(sensorCubit),
               ),
-              _MarkActivityField(BuildContextX(context).read(sensorBlocProvider)),
+              _MarkActivityField(sensorCubit),
             ]),
           ],
         ),
