@@ -3,10 +3,8 @@ import 'package:norbusensor/src/features/datasensor/widgets/item_activity_widget
 import 'package:norbusensor/src/features/datasensor/widgets/new_item_activity_widget.dart';
 import 'package:norbusensor/src/features/devices/blocs/bloc_device/device_bloc.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_hooks_bloc/flutter_hooks_bloc.dart' as fromHooks;
 
-import 'package:norbusensor/src/core/core_providers.dart';
 import 'package:norbusensor/src/features/datasensor/blocs/bloc_data_sensor/data_sensor_bloc.dart';
 import 'package:norbusensor/src/features/devices/widgets/connection_button_widget.dart';
 import 'package:norbusensor/src/config/app_colors.dart';
@@ -17,11 +15,12 @@ import 'package:intl/intl.dart';
 class DataSensorScreen extends StatelessWidget {
   static const String routeName = '/sensor_page';
 
+  final DeviceBloc deviceBloc;
+  final DataSensorBloc sensorCubit;
+  DataSensorScreen({this.deviceBloc, this.sensorCubit});
+
   @override
   Widget build(BuildContext context) {
-    final DeviceBloc deviceBloc = BuildContextX(context).read(deviceBlocProvider);
-    final DataSensorBloc sensorCubit = BuildContextX(context).read(sensorBlocProvider);
-
     return Scaffold(
       appBar: AppBar(
         leading: Navigator.canPop(context)

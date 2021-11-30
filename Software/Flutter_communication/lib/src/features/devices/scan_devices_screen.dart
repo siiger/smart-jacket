@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_hooks_bloc/flutter_hooks_bloc.dart' as fromHooks;
 
-import 'package:norbusensor/src/core/core_providers.dart';
 import 'package:norbusensor/src/features/devices/widgets/scan_result_item_widget.dart';
 import 'package:norbusensor/src/features/devices/blocs/bloc_device/device_bloc.dart';
 import 'package:norbusensor/src/config/app_colors.dart';
 import 'package:norbusensor/src/common_widgets/border_widget.dart';
 
 class ScanDevicesScreen extends StatelessWidget {
+  final DeviceBloc deviceBloc;
+  ScanDevicesScreen(this.deviceBloc);
+
   @override
   Widget build(BuildContext context) {
-    final DeviceBloc deviceBloc = BuildContextX(context).read(deviceBlocProvider);
     return Scaffold(
       appBar: AppBar(
         title: Text(

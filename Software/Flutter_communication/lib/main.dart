@@ -9,7 +9,6 @@ import 'package:flutter_hooks_bloc/flutter_hooks_bloc.dart' as fromHooks;
 import 'package:norbusensor/src/core/core_providers.dart';
 import 'package:norbusensor/src/config/routes.dart';
 import 'package:norbusensor/src/config/themes.dart';
-import 'package:norbusensor/src/features/datasensor/data_sensor_screen.dart';
 import 'package:norbusensor/src/features/datasensor/blocs/bloc_data_sensor/data_sensor_bloc.dart';
 
 void main() {
@@ -29,11 +28,11 @@ class App extends StatelessWidget {
           buildWhen: (previous, current) => (previous.stateBle != current.stateBle),
           builder: (context, state) {
             if (state.stateBle == BluetoothState.on) {
-              return ScanDevicesScreen();
+              return ScanDevicesScreen(BuildContextX(context).read(deviceBlocProvider));
             }
             return BluetoothOffScreen(state: state.stateBle);
           }),
-      onGenerateRoute: Routes.onGenerateRoute,
+      onGenerateRoute: Routes(context).onGenerateRoute,
     );
   }
 }

@@ -1,15 +1,22 @@
 import 'dart:io';
 
+import 'package:norbusensor/src/core/core_providers.dart';
 import 'package:norbusensor/src/features/datasensor/data_sensor_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Routes {
-  Routes._();
-  static Route<dynamic> onGenerateRoute(RouteSettings settings) {
+  final BuildContext context;
+  Routes(this.context);
+  Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case DataSensorScreen.routeName:
-        return _getPageRoute(routeName: settings.name, viewToShow: DataSensorScreen());
+        return _getPageRoute(
+            routeName: settings.name,
+            viewToShow: DataSensorScreen(
+                deviceBloc: BuildContextX(context).read(deviceBlocProvider),
+                sensorCubit: BuildContextX(context).read(sensorBlocProvider)));
         break;
       default:
         return MaterialPageRoute(builder: (context) {
