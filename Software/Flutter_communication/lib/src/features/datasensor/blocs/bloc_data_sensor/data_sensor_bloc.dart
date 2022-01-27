@@ -17,6 +17,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:norbusensor/src/config/app_colors.dart';
 import 'package:norbusensor/src/core/utils/show_message.dart';
+import 'package:http/http.dart' as http;
+import 'package:csv/csv.dart';
 
 part 'data_sensor_event.dart';
 part 'data_sensor_state.dart';
@@ -41,6 +43,12 @@ class DataSensorBloc extends Bloc<SensorEvent, DataSensorState> {
   ChartSeriesController _chartSeriesControllerSt;
   final int _deltaChartData = 100;
   List<DataSensorModel> _dataBr = [];
+
+  //Post data to server
+  http.StreamedResponse response;
+  http.Response responsePost;
+  var url = Uri.parse('http://192.168.0.100:5500/products/add/');
+  var urlP = Uri.parse('http://192.168.0.100:5500/products/');
 
   @override
   Stream<DataSensorState> mapEventToState(
@@ -283,19 +291,28 @@ class DataSensorBloc extends Bloc<SensorEvent, DataSensorState> {
   Stream<DataSensorState> _mapSaveDataToLocalPathToState(DataSensorState state) async* {
     if (!state.isRealTimeMode || !state.isRecToMemoryMode) {
       final path = await _localPath;
-      final file = await _localFileData;
+      final nameData = fileName("sensor");
+      final f = await _localFileData(nameData);
+
       int saveDataEndIndex = state.listSensorData.length;
-      String data = '';
+      List<List<dynamic>> rows = [];
       for (int i = saveDataStartIndex; i < saveDataEndIndex; i++) {
-        data = data +
-            state.listSensorData[i].lastTime.toString() +
-            ',' +
-            state.listSensorData[i].stbreath.toString() +
-            ',' +
-            state.listSensorData[i].chbreath.toString() +
-            '\r\n';
+        rows.add([
+          state.listSensorData[i].lastTime.toString(),
+          state.listSensorData[i].stbreath,
+          state.listSensorData[i].chbreath
+        ]);
       }
-      await file.writeAsString(data, mode: FileMode.append);
+      String csv = const ListToCsvConverter().convert(rows);
+      await f.writeAsString(csv, mode: FileMode.append);
+
+      var stream = f.readAsBytes().asStream();
+      var length = f.lengthSync();
+      var name = f.path.split("/").last;
+      var request = http.MultipartRequest('POST', url);
+      request.files.add(http.MultipartFile('file', stream, length, filename: name));
+      response = await request.send();
+
       saveDataStartIndex = saveDataEndIndex;
       showMessage("Saving data to: ${path}", toastLen: Toast.LENGTH_LONG);
     }
@@ -338,9 +355,14 @@ class DataSensorBloc extends Bloc<SensorEvent, DataSensorState> {
     return directory.path;
   }
 
-  Future<File> get _localFileData async {
+  Future<File> _localFileData(String name) async {
     final path = await _localPath;
-    return File('$path/sensordata.txt');
+    return File('$path/$name.csv');
+  }
+
+  String fileName(String postname) {
+    DateTime t = DateTime.now();
+    return '${t.year}${t.month}${t.day}${t.hour}${t.minute}${t.second}${t.millisecond}.' + postname;
   }
 
   Future<File> get _localFileActivity async {

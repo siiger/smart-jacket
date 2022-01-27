@@ -28,6 +28,8 @@ dependencies:
 
  
   cupertino_icons: ^1.0.0
+  http: ^0.13.4
+  csv: ^5.0.1
 
 dev_dependencies:
   flutter_test:
