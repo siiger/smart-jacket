@@ -1,6 +1,7 @@
-import dash
+from jupyter_dash import JupyterDash
 from dash import dcc
 from dash import html
+import dash_bootstrap_components as dbc
 from plotly.subplots import make_subplots
 import plotly.graph_objs as go
 import pandas as pd
@@ -8,16 +9,26 @@ import numpy as np
 from dash.dependencies import Output, Input
 from app_functools import calculate_freq, calculate_irreg, calculate_divide, data_peaks
 
+from tslearn.clustering import KShape
+from tslearn.preprocessing import TimeSeriesScalerMeanVariance
+
+from db_postgres import get_data
+
+
+
+        
 
 # Import the dataset
-filepath_st = '/data/sensordata.csv'
+filepath_st ='sensordata.csv'
 st = pd.read_csv(filepath_st)
 
-filepath_actv = '/data/sensordataactivity.csv'
+filepath_actv ='sensordataactivity.csv'
 act = pd.read_csv(filepath_actv)
 #
+#Get data from database
+#st = get_data()
 # calulation data
-st['Date'] = pd.to_datetime(st.Date)
+st['Date'] = pd.to_datetime(st.timestamp)
 act['Date'] = pd.to_datetime(act.Date)
 
 activty, che_value, sto_value, che_peaks, sto_peaks, che_freq, sto_freq, che_irreg, sto_irreg, ch_st_div = 'Activity', 'Che.Value', 'Sto.Value', 'Che.Peaks', 'Sto.Peaks', 'Che.Freq', 'Sto.Freq', 'Che.Irreg', 'Sto.Irreg', 'Che.Val/Sto.Val' 
@@ -57,11 +68,22 @@ corporate_colors = {
     'bg-white': '#f9f9f9',
     'sto-value-blue' : '#3a97e9',
     'che-value-green' : '#43b582',
+    'bar-orange' : '#f5cf8b',
 }
 
-# dropdown options
+# id 
+id_sliders = ['slider1', 'slider2']
+id_dropds = ['drop1', 'drop2']
+
+# dropdown options 1
 features = [activty, che_value, sto_value, che_peaks, sto_peaks, che_freq, sto_freq, che_irreg, sto_irreg, ch_st_div]
-opts = [{'label' : i, 'value' : i} for i in features]
+opts1 = [{'label' : i, 'value' : i} for i in features]
+#
+
+# dropdown options 2
+features2 = [che_value, sto_value]
+opts2 = [{'label' : i, 'value' : i} for i in features2]
+init_opts2 = [sto_value]
 #
 
 # range slider options
@@ -90,8 +112,8 @@ if int(count_marks%len_marks1)!=0:
 # 
 
 # Create a plotly figure for data
-g_opt1, g_opt2 = [opts[0]["value"], opts[1]["value"], opts[2]["value"]],      [opts[5]["value"], opts[6]["value"]]
-init_opts = [g_opt1[0],g_opt1[1], g_opt1[2], g_opt2[0], g_opt2[1]]
+g_opt1, g_opt2 = [opts1[0]["value"], opts1[1]["value"], opts1[2]["value"]],      [opts1[5]["value"], opts1[6]["value"]]
+init_opts1 = [g_opt1[0],g_opt1[1], g_opt1[2], g_opt2[0], g_opt2[1]]
 fig = make_subplots(rows=2, cols=1)
 fig.append_trace(go.Scatter(x = st.Date, y = st[che_value],name = che_value,line = dict(width = 2,color = corporate_colors['che-value-green'])),1,1)
 fig.append_trace(go.Scatter(x = st.Date, y = st[sto_value],name = sto_value,line = dict(width = 2,color = corporate_colors['sto-value-blue'])),1,1)
@@ -102,21 +124,171 @@ fig.update_yaxes(showline=True, linewidth=2, linecolor=corporate_colors['axis-gr
 fig.update_layout(font_color=corporate_colors['font-grey'], plot_bgcolor = corporate_colors['bg-white'], paper_bgcolor = corporate_colors['bg-white'])
 
 
-external_stylesheets = [
-    {
-        "href": "https://fonts.googleapis.com/css2?"
-        "family=Lato:wght@400;700&display=swap",
-        "rel": "stylesheet",
-    },
-]
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
+# ML clustering
+dt = 10
+data0 = st['Sto.Value'].tolist()
+lo = len(data0)//dt
+#print(lo)
+data0 = data0[:lo*dt]
+DTIME = st['Date'].tolist()
+data1 = np.reshape(data0, (lo, dt))
+#print(data1.shape)
+X = data1
+t = np.arange(dt)
+n_clus = 3
+cluster_titl = ["Cluster %d" % (i + 1) for i in np.arange(n_clus)]
+h = np.zeros(n_clus)
+X = TimeSeriesScalerMeanVariance(mu=0., std=0.5).fit_transform(X)
+ks = KShape(n_clusters=n_clus, n_init=1, random_state=0).fit(X)
+ks.cluster_centers_.shape
+y_pred = ks.fit_predict(X)
+
+figCl = make_subplots(rows=n_clus, cols=1, subplot_titles=(cluster_titl))
+for yi in range(n_clus):
+    for xx in X[y_pred == yi]:
+        h[yi] = h[yi]+1
+        figCl.append_trace(go.Scatter(
+            x=t,
+            y=xx.ravel(),
+            line=dict(width=2,
+                      color=corporate_colors['bar-orange']),
+        ), row=yi+1, col=1),
+    figCl.append_trace(go.Scatter(
+        x=t,
+        y=ks.cluster_centers_[yi].ravel(),
+        line=dict(width=2,
+                  color='rgb(0, 151, 50)')
+    ), row=yi+1, col=1)
+figCl.update_xaxes(showline=True, linewidth=2, linecolor=corporate_colors['axis-grey'], gridcolor=corporate_colors['axis-grey'])
+figCl.update_yaxes(showline=True, linewidth=2, linecolor=corporate_colors['axis-grey'], gridcolor=corporate_colors['axis-grey'])
+figCl.update_layout(font_color=corporate_colors['font-grey'], plot_bgcolor = corporate_colors['bg-white'], paper_bgcolor = corporate_colors['bg-white'])
+figBar = go.Figure([go.Bar(x=cluster_titl, y=h, marker={'color': corporate_colors['bar-orange']})])
+figBar.update_xaxes(showline=True, linewidth=2, linecolor=corporate_colors['axis-grey'], gridcolor=corporate_colors['axis-grey'])
+figBar.update_yaxes(showline=True, linewidth=2, linecolor=corporate_colors['axis-grey'], gridcolor=corporate_colors['axis-grey'])
+figBar.update_layout(font_color=corporate_colors['font-grey'], plot_bgcolor = corporate_colors['bg-white'], paper_bgcolor = corporate_colors['bg-white'])
+
+
+
+#####_____________APP________________####
+#########################################
+app = JupyterDash(external_stylesheets=[dbc.themes.SANDSTONE])
 server = app.server
 app.title = "Breathing Analytics: Understand Your Breathing!"
 
-app.layout = html.Div(
-    children=[
-        html.Div(
-            children=[
+def drawSlider(id_slider, title):
+    return  html.Div([
+                html.Div(
+                    children= title, className="slider-title"
+                ),
+                html.Div(
+                    children=[
+                            dcc.RangeSlider(id = id_slider,
+                                        min = 0,
+                                        max = count_marks-1,
+                                        value = [0, count_marks-1],
+                                        marks={
+                                            str(pos): {
+                                                "label": str(Times.get(pos)),
+                                                "style": {"color": "#9b9b9b", "width": "9%"},
+                                            }
+                                            for pos in Times.keys()
+                                        },
+                            ),
+                    ],
+                    className="wrapper-slider", 
+                ),
+                    ],
+                )
+  
+
+def drawDropdown(opts, init_opts, id_dropd):
+    return   html.Div(
+                children=[
+                    html.Div(children="Features", className="menu-title"),
+                    html.Div(
+                            children=[dcc.Dropdown(id = id_dropd, options = opts,
+                                value = init_opts, multi=True, style = {'width': '96%'})
+                            ],
+                            className="wrapper-options",  
+                    ),
+                    ],  
+                )
+   
+def drawMenu(opts, init_opts, id_dropd, id_slider):
+    return html.Div([
+        dbc.Card([ 
+            dbc.CardBody([
+                drawSlider(id_slider, "Date Range"),
+                drawDropdown(opts, init_opts, id_dropd), 
+            ],)
+        ],
+        className="menu",
+        ),
+    ])
+def drawDataFigure():
+    return html.Div([
+        dbc.Card([ 
+            dbc.CardBody([
+               dcc.Graph(id = 'plot', figure = fig),
+                
+            ],)
+        ],
+        className="wrapper-card",
+        ),
+    ]) 
+
+def drawClusteringMenu(opts, init_opts, id_dropd, id_slider):
+    return html.Div([
+        dbc.Card([ 
+            dbc.CardBody([
+                    drawSlider(id_slider, "Date Range for Clustering"),
+                    dbc.Row([
+                         dbc.Col([
+                         drawDropdown(opts, init_opts, id_dropd),
+                         ], width=8),
+                         dbc.Col([
+                         html.Div(
+                            children=[
+                                html.Div(children="Cluster count", className="menu-title-input"),
+                                html.Div(children=[dcc.Input(id="cluster-count", type="number", value=2),],
+                                   className="wrapper-input",  
+                                  ),
+                                ],  
+                            ),    
+                         ], width=3),
+                        ]),
+                     ],)
+                ],
+             className="menu",
+             ),
+    ])
+
+def drawClusterFigure():
+    return html.Div([
+        dbc.Card([ 
+            dbc.CardBody([
+               dcc.Graph(id='plotCl', figure=figCl),   
+            ],)
+        ],
+        className="wrapper-card1",
+        ),
+    ]) 
+
+def drawBarFigure():
+    return html.Div([
+        dbc.Card([ 
+            dbc.CardBody([
+               dcc.Graph(id='plotBar', figure=figBar),
+            ],)
+        ],
+        className="wrapper-card1",
+        ),
+    ])       
+
+def drawText():
+    return html.Div(
+        children=[
                 #html.P(children="health-graph.ico", className="header-emoji"),
                 html.H1(
                     children="Breathing Analytics", className="header-title"
@@ -125,68 +297,56 @@ app.layout = html.Div(
                     children="Data analysis of breathing characteristics",
                     className="header-description",
                 ),
-            ],
-            className="header",
-        ),
-        html.Div(
-            children=[
-                html.Div(
-                    children=[
-                        html.Div(
-                            children="Date Range", className="slider-title"
-                        ),
-                        html.Div(
-                            children=[
-                                    dcc.RangeSlider(id = 'slider',
-                                                min = 0,
-                                                max = count_marks-1,
-                                                value = [0, count_marks-1],
-                                                marks={
-                                                    str(pos): {
-                                                        "label": str(Times.get(pos)),
-                                                        "style": {"color": "#9b9b9b", "width": "9%"},
-                                                    }
-                                                    for pos in Times.keys()
-                                                },
-                                    ),
-                            ],
-                            className="wrapper-slider", 
-                        ),
-                    ],
-                ),
+                ], className="header"
+                )
 
-                html.Div(
-                    children=[
-                        html.Div(children="Features", className="menu-title"),
-                        html.Div(
-                                children=[dcc.Dropdown(id = 'opt', options = opts,
-                                    value = init_opts, multi=True, style = {'width': '96%'})
-                                ],
-                                className="wrapper-options",  
-                        ),
-                    ],  
-                ),                                             
-                
-            ],
-            className="menu",
-        ),
-        html.Div(
-            children=[
-                html.Div(
-                    children=[dcc.Graph(id = 'plot', figure = fig),],
-                    className="card",
-                ),
-            ],
-            className="wrapper-card",
-        ),
-    ]
+app.layout = html.Div(
+    children=[
+        dbc.Card(
+            dbc.CardBody([
+                dbc.Row([
+                    dbc.Col([
+                    drawText(),
+                    ]),
+                ], align='center'),    
+                dbc.Row([
+                    dbc.Col([
+                    drawMenu(opts1, init_opts1, id_dropds[0], id_sliders[0]),
+                    ]),
+                ], align='center'),
+                html.Br(),
+                dbc.Row([
+                    dbc.Col([
+                    drawDataFigure(),
+                    ]),
+                ], align='center'),
+                html.Br(),       
+                dbc.Row([
+                    dbc.Col([
+                    drawClusteringMenu(opts2, init_opts2, id_dropds[1], id_sliders[1]),
+                    ]),
+                ], align='center'),       
+                dbc.Row([
+                    dbc.Col([
+                    drawClusterFigure()
+                    ], width=6),
+                    dbc.Col([
+                    drawBarFigure()
+                    ], width=6),
+                    ], align='center'),                  
+            ],className="basic"
+            ),
+        ),]
 )
 
 
 # Add callback functions
-@app.callback(Output('plot', 'figure'),
-             [Input('opt', 'value'),
-             Input('slider', 'value')])
+@app.callback(
+                 Output('plot', 'figure'),
+             [
+                 Input(id_dropds[0], 'value'),
+                 Input(id_sliders[0], 'value')
+             ])
 def update_figure(input1, input2):
     # updating the plot
     trace1, trace2, act1 = [], [], []
@@ -221,6 +381,7 @@ def update_figure(input1, input2):
     
     data1 = [val for sublist in [trace1] for val in sublist]
     data2 = [val for sublist in [trace2] for val in sublist]
+    
     fig = make_subplots(rows=2, cols=1)
     for tr in data1:
         fig.append_trace(tr,1,1,)
@@ -229,26 +390,95 @@ def update_figure(input1, input2):
 
     for optt in input1:
         if optt == activty:
+            fig.update_layout(margin=dict(l=50, r=0,))
+            arrayy1 =[]
             act1 = act[(act.Date > dates[input2[0]]) & (act.Date < dates[input2[1]])]      
             array1 = act1.Date.tolist()
-            array1.append(dates[input2[1]]) 
+            array1.append(dates[input2[1]])
             array2 = act1.Activity.tolist()
-            
             act_l = act[(act.Date < dates[input2[0]])]
             array_l = act_l.Date.tolist()
             if len(array_l)!=0:
                 array2.insert(0, act_l.Activity.tolist()[-1])
-                array1.insert(0, dates[input2[0]])  
+                array1.insert(0, dates[input2[0]])
+                  
                       
             len1 =len(array1)
             for i in range(len1 - 1):
-                fig.add_vrect(x0=array1[i], x1=array1[i+1], annotation_text=array2[i], annotation_position="bottom left", line_width=0.5)
+                #arrayy1.append(1350 ) 
+                fig.add_shape(type="rect", x0=array1[i], x1=array1[i+1], y0= 1300, y1=1900, line_width=1.5)
+                fig.add_annotation(x=array1[i], y=1350, text=array2[i], showarrow=False, align="right", xanchor='left', xref="x", yref="y")
+            #fig.add_trace(go.Scatter(x=array1, y=arrayy1, text=array2, mode="text", textposition="top right"), 1,1) 
+
     fig.update_xaxes(showline=True, linewidth=2, linecolor=corporate_colors['axis-grey'], gridcolor=corporate_colors['axis-grey'])
     fig.update_yaxes(showline=True, linewidth=2, linecolor=corporate_colors['axis-grey'], gridcolor=corporate_colors['axis-grey'])
-    fig.update_layout(font_color=corporate_colors['font-grey'], plot_bgcolor = corporate_colors['bg-white'], paper_bgcolor = corporate_colors['bg-white'])
+    fig.update_layout( font_color=corporate_colors['font-grey'], plot_bgcolor = corporate_colors['bg-white'], paper_bgcolor = corporate_colors['bg-white'])
     return fig
 
 
 
+
+# Add callback functions for Clastering data
+@app.callback([
+                Output('plotCl', 'figure'),
+                Output('plotBar', 'figure'),
+              ],   
+              [
+                 Input(id_dropds[1], 'value'),
+                 Input(id_sliders[1], 'value'),
+                 Input("cluster-count", "value"),
+              ])
+def update_figure(input1, input2, input3):
+    # updating the plot
+    data0, DTIME= [], []
+    for optt in input1:
+           st1 = st[(st.Date >= dates[input2[0]]) & (st.Date <= dates[input2[1]])]
+           data0 = st1[optt].tolist()
+           DTIME = st1.Date.tolist()          
+    
+    
+    # ML clustering
+    dt = 10
+    lo = len(data0)//dt
+    #print(lo)
+    data0 = data0[:lo*dt]
+    data1 = np.reshape(data0, (lo, dt))
+    #print(data1.shape)
+    X = data1
+    t = np.arange(dt)
+    n_clus = input3
+    cluster_titl = ["Cluster %d" % (i + 1) for i in np.arange(n_clus)]
+    h = np.zeros(n_clus)
+    X = TimeSeriesScalerMeanVariance(mu=0., std=0.5).fit_transform(X)
+    ks = KShape(n_clusters=n_clus, n_init=1, random_state=0).fit(X)
+    ks.cluster_centers_.shape
+    y_pred = ks.fit_predict(X)
+
+    figCl = make_subplots(rows=n_clus, cols=1, subplot_titles=(cluster_titl))
+    for yi in range(n_clus):
+        for xx in X[y_pred == yi]:
+            h[yi] = h[yi]+1
+            figCl.append_trace(go.Scatter(
+                x=t,
+                y=xx.ravel(),
+                line=dict(width=2,
+                        color=corporate_colors['bar-orange']),
+            ), row=yi+1, col=1),
+        figCl.append_trace(go.Scatter(
+            x=t,
+            y=ks.cluster_centers_[yi].ravel(),
+            line=dict(width=2,
+                    color='rgb(0, 151, 50)')
+        ), row=yi+1, col=1)
+    figBar = go.Figure([go.Bar(x=cluster_titl, y=h, marker={'color': corporate_colors['bar-orange']})])
+    figCl.update_layout(font_color=corporate_colors['font-grey'], plot_bgcolor = corporate_colors['bg-white'], paper_bgcolor = corporate_colors['bg-white'])
+    figCl.update_xaxes(showline=True, linewidth=2, linecolor=corporate_colors['axis-grey'], gridcolor=corporate_colors['axis-grey'])
+    figCl.update_yaxes(showline=True, linewidth=2, linecolor=corporate_colors['axis-grey'], gridcolor=corporate_colors['axis-grey'])
+    figBar.update_xaxes(showline=True, linewidth=2, linecolor=corporate_colors['axis-grey'], gridcolor=corporate_colors['axis-grey'])
+    figBar.update_yaxes(showline=True, linewidth=2, linecolor=corporate_colors['axis-grey'], gridcolor=corporate_colors['axis-grey'])
+    figBar.update_layout(font_color=corporate_colors['font-grey'], plot_bgcolor = corporate_colors['bg-white'], paper_bgcolor = corporate_colors['bg-white'])    
+    return figCl , figBar
+
+
 if __name__ == "__main__":
-    app.run_server(debug=False)
+   app.run_server(debug=True)

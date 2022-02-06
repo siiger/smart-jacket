@@ -10,6 +10,10 @@ body {
     padding: 16px 0 0 0;
 }
 
+.basic {
+    background-color: #f2f2f2;
+}
+
 .header-emoji {
     font-size: 48px;
     margin: 0 auto;
@@ -35,8 +39,20 @@ body {
     margin-right: auto;
     margin-left: auto;
     max-width: 1024px;
-    padding-right: 10px;
-    padding-left: 10px;
+    background-color: #f9f9f9;
+    /*padding-right: 10px;*/
+    /*padding-left: 10px;*/
+    padding-bottom: 10px;
+    margin-top: 22px;
+}
+
+.wrapper-card1 {
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 540px;
+    background-color: #f9f9f9;
+    /*padding-right: 10px;*/
+    /*padding-left: 10px;*/
     margin-top: 22px;
 }
 
@@ -46,14 +62,14 @@ body {
 }
 
 .menu {
-    height: 228px;
+    height: 238px;
     width: 812px;
     /*display: flex;*/
     justify-content: space-evenly;
     padding-top: 24px;
-    margin: -80px auto 0 auto;
+    margin: -20px auto 0 auto;
     background-color: #f9f9f9;
-    box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.18);
+    /*box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.18);*/
 }
 
 .Select-control {
@@ -74,7 +90,15 @@ body {
     padding-left: 24px;
     /*font-weight: bold;*/
     padding-bottom: 9px;
-    padding-top: 12px;
+    padding-top: 24px;
+    color: #606060;
+}
+
+.menu-title-input {
+    margin-bottom: 6px;
+    /*font-weight: bold;*/
+    padding-bottom: 9px;
+    padding-top: 24px;
     color: #606060;
 }
 
@@ -118,10 +142,30 @@ body {
     width: 90%; 
 }
 
+/* Input 
+__________________________________________________ */
+
+#cluster-count {
+    font-weight: bold;
+    color: #606060;
+    background-color: #f9f9f9;
+    height: 38px;
+    border-color: #1f78b4;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-left-width: 1px;
+    border-bottom-width: 1px;
+    border-radius: 0rem;
+    /*text-align: center;*/
+    width: 50%;
+    outline: none;
+    padding-left: 10px;
+}
+
 
 /* Dropdown
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
-#opt .Select-control {
+.wrapper-options .Select-control {
     /*font-weight: bold;*/
     color: #1f78b4;
     background-color: #f9f9f9;
@@ -135,8 +179,9 @@ body {
     /*text-align: center;*/
     width: 17%;
     }
+   
 
-#opt  .Select--multi .Select-value-icon {
+.wrapper-options  .Select--multi .Select-value-icon {
         cursor: pointer;
         border-bottom-left-radius: 2px;
         border-top-left-radius: 2px;
@@ -146,18 +191,22 @@ body {
     }    
     
 
-#opt .Select--multi .Select-value {
+.wrapper-options .Select--multi .Select-value {
     border-color: #1f78b4;
     background-color: #f9f9f9;
     color: #606060;
   }
 
-#opt .VirtualizedSelectFocusedOption {
+.wrapper-options .VirtualizedSelectFocusedOption {
     background-color: #8eb9d6;
   } 
 
   .wrapper-options {
     padding-left: 36px;
     padding-bottom: 22px;
+} 
+
+.wrapper-input {
+    height: 47px;
 }  
 
