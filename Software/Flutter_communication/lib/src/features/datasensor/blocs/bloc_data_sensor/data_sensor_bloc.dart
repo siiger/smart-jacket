@@ -47,8 +47,8 @@ class DataSensorBloc extends Bloc<SensorEvent, DataSensorState> {
   //Post data to server
   http.StreamedResponse response;
   http.Response responsePost;
-  var url = Uri.parse('http://192.168.0.100:5500/products/add/');
-  var urlP = Uri.parse('http://192.168.0.100:5500/products/');
+  var url = Uri.parse('http://192.168.0.100:5501/products/add/');
+  var urlP = Uri.parse('http://192.168.0.100:5501/products/');
 
   @override
   Stream<DataSensorState> mapEventToState(
@@ -284,8 +284,12 @@ class DataSensorBloc extends Bloc<SensorEvent, DataSensorState> {
     final file = await _localFileActivity;
     DateTime time = DateTime.now();
     await file.writeAsString(time.toString() + ',' + currentActivityUp + '\r\n', mode: FileMode.append);
+    //http
+    List<dynamic> rows = [time.toString(), currentActivityUp];
+    var body = jsonEncode(rows);
+    responsePost = await http.post(urlP, body: body);
+    //
     yield state.copyWith(currentActivity: currentActivityUp);
-    //yield state.copyWith(listSensorData: state.listSensorData..addAll([event.sensorData]));
   }
 
   Stream<DataSensorState> _mapSaveDataToLocalPathToState(DataSensorState state) async* {
