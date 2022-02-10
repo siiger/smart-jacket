@@ -12,42 +12,33 @@ from app_functools import calculate_freq, calculate_irreg, calculate_divide, dat
 from tslearn.clustering import KShape
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance
 
-from db_postgres import get_data
+from db_postgres import get_data, get_activity
 
 
-
-        
-
-# Import the dataset
-filepath_st ='sensordata.csv'
-st = pd.read_csv(filepath_st)
-
-filepath_actv ='sensordataactivity.csv'
-act = pd.read_csv(filepath_actv)
-#
 #Get data from database
-#st = get_data()
+st = get_data()
+act = get_activity()
 # calulation data
-st['Date'] = pd.to_datetime(st.timestamp)
-act['Date'] = pd.to_datetime(act.Date)
+st['timestamp'] = pd.to_datetime(st.timestamp)
+act['timestamp'] = pd.to_datetime(act.timestamp)
 
-activty, che_value, sto_value, che_peaks, sto_peaks, che_freq, sto_freq, che_irreg, sto_irreg, ch_st_div = 'Activity', 'Che.Value', 'Sto.Value', 'Che.Peaks', 'Sto.Peaks', 'Che.Freq', 'Sto.Freq', 'Che.Irreg', 'Sto.Irreg', 'Che.Val/Sto.Val' 
+activty, che_value, sto_value, che_peaks, sto_peaks, che_freq, sto_freq, che_irreg, sto_irreg, ch_st_div = 'Activity', 'chest', 'stom', 'Che.Peaks', 'Sto.Peaks', 'Che.Freq', 'Sto.Freq', 'Che.Irreg', 'Sto.Irreg', 'Che.Val/Sto.Val' 
 
-a_fch = calculate_freq(st[che_value], st['Date'])
-a_irrch = calculate_irreg(st[che_value], st['Date'])
-a_fst = calculate_freq(st[sto_value], st['Date'])
-a_irrst = calculate_irreg(st[sto_value], st['Date'])
+a_fch = calculate_freq(st[che_value], st['timestamp'])
+a_irrch = calculate_irreg(st[che_value], st['timestamp'])
+a_fst = calculate_freq(st[sto_value], st['timestamp'])
+a_irrst = calculate_irreg(st[sto_value], st['timestamp'])
 a_div = calculate_divide(st[che_value], st[sto_value])
-a_pch = data_peaks(st[che_value], st['Date'])
-a_pst = data_peaks(st[sto_value], st['Date'])
+a_pch = data_peaks(st[che_value], st['timestamp'])
+a_pst = data_peaks(st[sto_value], st['timestamp'])
 
-st_freq_ch = pd.DataFrame({'Date':a_fch[0], che_freq: a_fch[1]})
-st_freq_st = pd.DataFrame({'Date':a_fst[0], sto_freq: a_fst[1]})
-st_irr_ch = pd.DataFrame({'Date':a_irrch[0], che_irreg: a_irrch[1]})
-st_irr_st = pd.DataFrame({'Date':a_irrst[0], sto_irreg: a_irrst[1]})
-st_pik_ch = pd.DataFrame({'Date':a_pch[0], che_peaks: a_pch[1]})
-st_pik_st = pd.DataFrame({'Date':a_pst[0], sto_peaks: a_pst[1]})
-st_div = pd.DataFrame({'Date':st['Date'], ch_st_div: a_div})
+st_freq_ch = pd.DataFrame({'timestamp':a_fch[0], che_freq: a_fch[1]})
+st_freq_st = pd.DataFrame({'timestamp':a_fst[0], sto_freq: a_fst[1]})
+st_irr_ch = pd.DataFrame({'timestamp':a_irrch[0], che_irreg: a_irrch[1]})
+st_irr_st = pd.DataFrame({'timestamp':a_irrst[0], sto_irreg: a_irrst[1]})
+st_pik_ch = pd.DataFrame({'timestamp':a_pch[0], che_peaks: a_pch[1]})
+st_pik_st = pd.DataFrame({'timestamp':a_pst[0], sto_peaks: a_pst[1]})
+st_div = pd.DataFrame({'timestamp':st['timestamp'], ch_st_div: a_div})
 #
 
 
@@ -87,7 +78,7 @@ init_opts2 = [sto_value]
 #
 
 # range slider options
-std = st['Date'][2:].tolist()
+std = st['timestamp'][2:].tolist()
 c = len(std)
 count_marks = int(float(c)//180)
 
@@ -115,10 +106,10 @@ if int(count_marks%len_marks1)!=0:
 g_opt1, g_opt2 = [opts1[0]["value"], opts1[1]["value"], opts1[2]["value"]],      [opts1[5]["value"], opts1[6]["value"]]
 init_opts1 = [g_opt1[0],g_opt1[1], g_opt1[2], g_opt2[0], g_opt2[1]]
 fig = make_subplots(rows=2, cols=1)
-fig.append_trace(go.Scatter(x = st.Date, y = st[che_value],name = che_value,line = dict(width = 2,color = corporate_colors['che-value-green'])),1,1)
-fig.append_trace(go.Scatter(x = st.Date, y = st[sto_value],name = sto_value,line = dict(width = 2,color = corporate_colors['sto-value-blue'])),1,1)
-fig.append_trace(go.Scatter(x = st_freq_ch.Date, y = st_freq_ch[che_freq],name = che_freq,line = dict(width = 2,color = corporate_colors['medium-green'])),2,1)
-fig.append_trace(go.Scatter(x = st_freq_st.Date, y = st_freq_st[sto_freq],name = sto_freq,line = dict(width = 2,color = corporate_colors['medium-blue'])),2,1)
+fig.append_trace(go.Scatter(x = st.timestamp, y = st[che_value],name = che_value,line = dict(width = 2,color = corporate_colors['che-value-green'])),1,1)
+fig.append_trace(go.Scatter(x = st.timestamp, y = st[sto_value],name = sto_value,line = dict(width = 2,color = corporate_colors['sto-value-blue'])),1,1)
+fig.append_trace(go.Scatter(x = st_freq_ch.timestamp, y = st_freq_ch[che_freq],name = che_freq,line = dict(width = 2,color = corporate_colors['medium-green'])),2,1)
+fig.append_trace(go.Scatter(x = st_freq_st.timestamp, y = st_freq_st[sto_freq],name = sto_freq,line = dict(width = 2,color = corporate_colors['medium-blue'])),2,1)
 fig.update_xaxes(showline=True, linewidth=2, linecolor=corporate_colors['axis-grey'], gridcolor=corporate_colors['axis-grey'])
 fig.update_yaxes(showline=True, linewidth=2, linecolor=corporate_colors['axis-grey'], gridcolor=corporate_colors['axis-grey'])
 fig.update_layout(font_color=corporate_colors['font-grey'], plot_bgcolor = corporate_colors['bg-white'], paper_bgcolor = corporate_colors['bg-white'])
@@ -127,11 +118,11 @@ fig.update_layout(font_color=corporate_colors['font-grey'], plot_bgcolor = corpo
 
 # ML clustering
 dt = 10
-data0 = st['Sto.Value'].tolist()
+data0 = st[sto_value].tolist()
 lo = len(data0)//dt
 #print(lo)
 data0 = data0[:lo*dt]
-DTIME = st['Date'].tolist()
+DTIME = st['timestamp'].tolist()
 data1 = np.reshape(data0, (lo, dt))
 #print(data1.shape)
 X = data1
@@ -352,32 +343,32 @@ def update_figure(input1, input2):
     trace1, trace2, act1 = [], [], []
     for optt in input1:
         if optt in g_opt1:
-           st1 = st[(st.Date >= dates[input2[0]]) & (st.Date <= dates[input2[1]])]
+           st1 = st[(st.timestamp >= dates[input2[0]]) & (st.timestamp <= dates[input2[1]])]
            if optt == che_value: 
-              trace1.append(go.Scatter(x = st1.Date, y = st1[optt],name = optt,line = dict(width = 2,color = corporate_colors['che-value-green'])))
+              trace1.append(go.Scatter(x = st1.timestamp, y = st1[optt],name = optt,line = dict(width = 2,color = corporate_colors['che-value-green'])))
            if optt == sto_value: 
-              trace1.append(go.Scatter(x = st1.Date, y = st1[optt],name = optt,line = dict(width = 2,color = corporate_colors['sto-value-blue']))) 
+              trace1.append(go.Scatter(x = st1.timestamp, y = st1[optt],name = optt,line = dict(width = 2,color = corporate_colors['sto-value-blue']))) 
         if optt == che_peaks:
-           st_pik_ch1 = st_pik_ch[(st_pik_ch.Date >= dates[input2[0]]) & (st_pik_ch.Date <= dates[input2[1]])] 
-           trace1.append(go.Scatter(x = st_pik_ch1.Date, y = st_pik_ch1[optt],name = optt,mode='markers',marker=dict(size=6,color = corporate_colors['light-green'],symbol='cross'),))
+           st_pik_ch1 = st_pik_ch[(st_pik_ch.timestamp >= dates[input2[0]]) & (st_pik_ch.timestamp <= dates[input2[1]])] 
+           trace1.append(go.Scatter(x = st_pik_ch1.timestamp, y = st_pik_ch1[optt],name = optt,mode='markers',marker=dict(size=6,color = corporate_colors['light-green'],symbol='cross'),))
         if optt == sto_peaks:
-           st_pik_st1 = st_pik_st[(st_pik_st.Date >= dates[input2[0]]) & (st_pik_st.Date <= dates[input2[1]])] 
-           trace1.append(go.Scatter(x = st_pik_st1.Date, y = st_pik_st1[optt],name = optt,mode='markers',marker=dict(size=6,color = corporate_colors['light-blue'],symbol='cross'),))        
+           st_pik_st1 = st_pik_st[(st_pik_st.timestamp >= dates[input2[0]]) & (st_pik_st.timestamp <= dates[input2[1]])] 
+           trace1.append(go.Scatter(x = st_pik_st1.timestamp, y = st_pik_st1[optt],name = optt,mode='markers',marker=dict(size=6,color = corporate_colors['light-blue'],symbol='cross'),))        
         if optt == che_freq:
-           st_freq_ch1 = st_freq_ch[(st_freq_ch.Date >= dates[input2[0]]) & (st_freq_ch.Date <= dates[input2[1]])] 
-           trace2.append(go.Scatter(x = st_freq_ch1.Date, y = st_freq_ch1[optt],name = optt,line = dict(width = 2,color = corporate_colors['medium-green'])))
+           st_freq_ch1 = st_freq_ch[(st_freq_ch.timestamp >= dates[input2[0]]) & (st_freq_ch.timestamp <= dates[input2[1]])] 
+           trace2.append(go.Scatter(x = st_freq_ch1.timestamp, y = st_freq_ch1[optt],name = optt,line = dict(width = 2,color = corporate_colors['medium-green'])))
         if optt == sto_freq:
-           st_freq_st1 = st_freq_st[(st_freq_st.Date >= dates[input2[0]]) & (st_freq_st.Date <= dates[input2[1]])] 
-           trace2.append(go.Scatter(x = st_freq_st1.Date, y = st_freq_st1[optt],name = optt,line = dict(width = 2,color = corporate_colors['medium-blue'])))
+           st_freq_st1 = st_freq_st[(st_freq_st.timestamp >= dates[input2[0]]) & (st_freq_st.timestamp <= dates[input2[1]])] 
+           trace2.append(go.Scatter(x = st_freq_st1.timestamp, y = st_freq_st1[optt],name = optt,line = dict(width = 2,color = corporate_colors['medium-blue'])))
         if optt == che_irreg:
-           st_irr_ch1 = st_irr_ch[(st_irr_ch.Date >= dates[input2[0]]) & (st_irr_ch.Date <= dates[input2[1]])] 
-           trace2.append(go.Scatter(x = st_irr_ch1.Date, y = st_irr_ch1[optt],name = optt,line = dict(width = 2,color = corporate_colors['light-green'])))
+           st_irr_ch1 = st_irr_ch[(st_irr_ch.timestamp >= dates[input2[0]]) & (st_irr_ch.timestamp <= dates[input2[1]])] 
+           trace2.append(go.Scatter(x = st_irr_ch1.timestamp, y = st_irr_ch1[optt],name = optt,line = dict(width = 2,color = corporate_colors['light-green'])))
         if optt == sto_irreg:
-           st_irr_st1 = st_irr_st[(st_irr_st.Date >= dates[input2[0]]) & (st_irr_st.Date <= dates[input2[1]])] 
-           trace2.append(go.Scatter(x = st_irr_st1.Date, y = st_irr_st1[optt],name = optt,line = dict(width = 2,color = corporate_colors['light-blue'])))
+           st_irr_st1 = st_irr_st[(st_irr_st.timestamp >= dates[input2[0]]) & (st_irr_st.timestamp <= dates[input2[1]])] 
+           trace2.append(go.Scatter(x = st_irr_st1.timestamp, y = st_irr_st1[optt],name = optt,line = dict(width = 2,color = corporate_colors['light-blue'])))
         if optt == ch_st_div:
-           st_div1 = st_div[(st_div.Date >= dates[input2[0]]) & (st_div.Date <= dates[input2[1]])] 
-           trace2.append(go.Scatter(x = st_div1.Date, y = st_div1[optt],name = optt,line = dict(width = 2,color = corporate_colors['brown'])))          
+           st_div1 = st_div[(st_div.timestamp >= dates[input2[0]]) & (st_div.timestamp <= dates[input2[1]])] 
+           trace2.append(go.Scatter(x = st_div1.timestamp, y = st_div1[optt],name = optt,line = dict(width = 2,color = corporate_colors['brown'])))          
     
     data1 = [val for sublist in [trace1] for val in sublist]
     data2 = [val for sublist in [trace2] for val in sublist]
@@ -391,15 +382,14 @@ def update_figure(input1, input2):
     for optt in input1:
         if optt == activty:
             fig.update_layout(margin=dict(l=50, r=0,))
-            arrayy1 =[]
-            act1 = act[(act.Date > dates[input2[0]]) & (act.Date < dates[input2[1]])]      
-            array1 = act1.Date.tolist()
+            act1 = act[(act.timestamp > dates[input2[0]]) & (act.timestamp < dates[input2[1]])]      
+            array1 = act1.timestamp.tolist()
             array1.append(dates[input2[1]])
-            array2 = act1.Activity.tolist()
-            act_l = act[(act.Date < dates[input2[0]])]
-            array_l = act_l.Date.tolist()
+            array2 = act1.act.tolist()
+            act_l = act[(act.timestamp < dates[input2[0]])]
+            array_l = act_l.timestamp.tolist()
             if len(array_l)!=0:
-                array2.insert(0, act_l.Activity.tolist()[-1])
+                array2.insert(0, act_l.act.tolist()[-1])
                 array1.insert(0, dates[input2[0]])
                   
                       
@@ -432,9 +422,9 @@ def update_figure(input1, input2, input3):
     # updating the plot
     data0, DTIME= [], []
     for optt in input1:
-           st1 = st[(st.Date >= dates[input2[0]]) & (st.Date <= dates[input2[1]])]
+           st1 = st[(st.timestamp >= dates[input2[0]]) & (st.timestamp <= dates[input2[1]])]
            data0 = st1[optt].tolist()
-           DTIME = st1.Date.tolist()          
+           DTIME = st1.timestamp.tolist()          
     
     
     # ML clustering

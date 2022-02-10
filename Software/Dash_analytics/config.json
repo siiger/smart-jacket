@@ -1,0 +1,22 @@
+{
+    "connection": {
+        "host": "0.0.0.0",
+        "port": 5432,
+        "user": "testjacet",
+        "password": "qwerty",
+        "db": "testjacet1"
+    },
+    "automl": {
+        "tabledata": "sensor",
+        "featuresdata":[
+            "timestamp",
+            "chest",
+            "stom"
+        ],
+        "tableact": "activity",
+        "featuresact":[
+            "timestamp",
+            "act"
+        ]
+    }
+}
