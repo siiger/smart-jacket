@@ -1,0 +1,23 @@
+syntax="proto3";
+
+option go_package = "github.com/siiger/smart-jacket/Golang_microservices/spec";
+
+package main;
+
+//protoc --go_out=. --go_opt=paths=source_relative ./spec/document.proto
+message Document {
+    string id = 1;
+    string name = 2;
+    int64 timestamp = 3;
+}
+
+message CreateDocumentMessage {
+    string uid = 1;
+    Document document = 2;
+    string replyTo = 3;
+}
+
+message CreateDocumentReply {
+    string uid = 1;
+    string status = 2;
+}
