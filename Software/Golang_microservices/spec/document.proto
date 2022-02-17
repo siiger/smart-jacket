@@ -1,5 +1,5 @@
 syntax="proto3";
-package kcproto;
+package spec;
 option go_package = ".;spec";
 
 //protoc --go_out=. --go_opt=paths=source_relative ./spec/document.proto
