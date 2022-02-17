@@ -1,8 +1,6 @@
 syntax="proto3";
-
-option go_package = "github.com/siiger/smart-jacket/Software/Golang_microservices/spec";
-
-package main;
+package kcproto;
+option go_package = ".;spec";
 
 //protoc --go_out=. --go_opt=paths=source_relative ./spec/document.proto
 message Document {
