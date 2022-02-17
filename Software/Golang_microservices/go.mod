@@ -1,4 +1,4 @@
-module github.com/siiger/smart-jacket/Software/Golang_microservices/spec
+module github.com/siiger/smart-jacket/Software/Golang_microservices
 
 go 1.17
 
