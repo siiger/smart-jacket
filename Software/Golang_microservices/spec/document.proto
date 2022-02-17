@@ -1,5 +1,5 @@
 syntax="proto3";
-package main;
+package spec;
 option go_package = "github.com/siiger/smart-jacket/Software/Golang_microservices/spec";
 
 
