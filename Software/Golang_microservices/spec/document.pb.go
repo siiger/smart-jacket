@@ -20,18 +20,20 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Document struct {
+//protoc --go_out=. --go_opt=paths=source_relative ./spec/document.proto
+type SensorData struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id        string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name      string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Timestamp int64  `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Id        string  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Timestamp int64   `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Chest     float32 `protobuf:"fixed32,3,opt,name=chest,proto3" json:"chest,omitempty"`
+	Stom      float32 `protobuf:"fixed32,4,opt,name=stom,proto3" json:"stom,omitempty"`
 }
 
-func (x *Document) Reset() {
-	*x = Document{}
+func (x *SensorData) Reset() {
+	*x = SensorData{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_spec_document_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -39,13 +41,13 @@ func (x *Document) Reset() {
 	}
 }
 
-func (x *Document) String() string {
+func (x *SensorData) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Document) ProtoMessage() {}
+func (*SensorData) ProtoMessage() {}
 
-func (x *Document) ProtoReflect() protoreflect.Message {
+func (x *SensorData) ProtoReflect() protoreflect.Message {
 	mi := &file_spec_document_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -57,44 +59,51 @@ func (x *Document) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Document.ProtoReflect.Descriptor instead.
-func (*Document) Descriptor() ([]byte, []int) {
+// Deprecated: Use SensorData.ProtoReflect.Descriptor instead.
+func (*SensorData) Descriptor() ([]byte, []int) {
 	return file_spec_document_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Document) GetId() string {
+func (x *SensorData) GetId() string {
 	if x != nil {
 		return x.Id
 	}
 	return ""
 }
 
-func (x *Document) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *Document) GetTimestamp() int64 {
+func (x *SensorData) GetTimestamp() int64 {
 	if x != nil {
 		return x.Timestamp
 	}
 	return 0
 }
 
-type CreateDocumentMessage struct {
+func (x *SensorData) GetChest() float32 {
+	if x != nil {
+		return x.Chest
+	}
+	return 0
+}
+
+func (x *SensorData) GetStom() float32 {
+	if x != nil {
+		return x.Stom
+	}
+	return 0
+}
+
+type ActivityData struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Uid      string    `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
-	Document *Document `protobuf:"bytes,2,opt,name=document,proto3" json:"document,omitempty"`
-	ReplyTo  string    `protobuf:"bytes,3,opt,name=replyTo,proto3" json:"replyTo,omitempty"`
+	Id        string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Timestamp int64  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Activity  string `protobuf:"bytes,3,opt,name=activity,proto3" json:"activity,omitempty"`
 }
 
-func (x *CreateDocumentMessage) Reset() {
-	*x = CreateDocumentMessage{}
+func (x *ActivityData) Reset() {
+	*x = ActivityData{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_spec_document_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -102,13 +111,13 @@ func (x *CreateDocumentMessage) Reset() {
 	}
 }
 
-func (x *CreateDocumentMessage) String() string {
+func (x *ActivityData) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateDocumentMessage) ProtoMessage() {}
+func (*ActivityData) ProtoMessage() {}
 
-func (x *CreateDocumentMessage) ProtoReflect() protoreflect.Message {
+func (x *ActivityData) ProtoReflect() protoreflect.Message {
 	mi := &file_spec_document_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -120,43 +129,44 @@ func (x *CreateDocumentMessage) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateDocumentMessage.ProtoReflect.Descriptor instead.
-func (*CreateDocumentMessage) Descriptor() ([]byte, []int) {
+// Deprecated: Use ActivityData.ProtoReflect.Descriptor instead.
+func (*ActivityData) Descriptor() ([]byte, []int) {
 	return file_spec_document_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *CreateDocumentMessage) GetUid() string {
+func (x *ActivityData) GetId() string {
 	if x != nil {
-		return x.Uid
+		return x.Id
 	}
 	return ""
 }
 
-func (x *CreateDocumentMessage) GetDocument() *Document {
+func (x *ActivityData) GetTimestamp() int64 {
 	if x != nil {
-		return x.Document
+		return x.Timestamp
 	}
-	return nil
+	return 0
 }
 
-func (x *CreateDocumentMessage) GetReplyTo() string {
+func (x *ActivityData) GetActivity() string {
 	if x != nil {
-		return x.ReplyTo
+		return x.Activity
 	}
 	return ""
 }
 
-type CreateDocumentReply struct {
+type CreateSensorDataMessage struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Uid    string `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
-	Status string `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	Uid     string      `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	Data    *SensorData `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+	ReplyTo string      `protobuf:"bytes,3,opt,name=replyTo,proto3" json:"replyTo,omitempty"`
 }
 
-func (x *CreateDocumentReply) Reset() {
-	*x = CreateDocumentReply{}
+func (x *CreateSensorDataMessage) Reset() {
+	*x = CreateSensorDataMessage{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_spec_document_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -164,13 +174,13 @@ func (x *CreateDocumentReply) Reset() {
 	}
 }
 
-func (x *CreateDocumentReply) String() string {
+func (x *CreateSensorDataMessage) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateDocumentReply) ProtoMessage() {}
+func (*CreateSensorDataMessage) ProtoMessage() {}
 
-func (x *CreateDocumentReply) ProtoReflect() protoreflect.Message {
+func (x *CreateSensorDataMessage) ProtoReflect() protoreflect.Message {
 	mi := &file_spec_document_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -182,19 +192,144 @@ func (x *CreateDocumentReply) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateDocumentReply.ProtoReflect.Descriptor instead.
-func (*CreateDocumentReply) Descriptor() ([]byte, []int) {
+// Deprecated: Use CreateSensorDataMessage.ProtoReflect.Descriptor instead.
+func (*CreateSensorDataMessage) Descriptor() ([]byte, []int) {
 	return file_spec_document_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *CreateDocumentReply) GetUid() string {
+func (x *CreateSensorDataMessage) GetUid() string {
 	if x != nil {
 		return x.Uid
 	}
 	return ""
 }
 
-func (x *CreateDocumentReply) GetStatus() string {
+func (x *CreateSensorDataMessage) GetData() *SensorData {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *CreateSensorDataMessage) GetReplyTo() string {
+	if x != nil {
+		return x.ReplyTo
+	}
+	return ""
+}
+
+type CreateActDataMessage struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Uid     string        `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	Data    *ActivityData `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+	ReplyTo string        `protobuf:"bytes,3,opt,name=replyTo,proto3" json:"replyTo,omitempty"`
+}
+
+func (x *CreateActDataMessage) Reset() {
+	*x = CreateActDataMessage{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_spec_document_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateActDataMessage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateActDataMessage) ProtoMessage() {}
+
+func (x *CreateActDataMessage) ProtoReflect() protoreflect.Message {
+	mi := &file_spec_document_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateActDataMessage.ProtoReflect.Descriptor instead.
+func (*CreateActDataMessage) Descriptor() ([]byte, []int) {
+	return file_spec_document_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CreateActDataMessage) GetUid() string {
+	if x != nil {
+		return x.Uid
+	}
+	return ""
+}
+
+func (x *CreateActDataMessage) GetData() *ActivityData {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *CreateActDataMessage) GetReplyTo() string {
+	if x != nil {
+		return x.ReplyTo
+	}
+	return ""
+}
+
+type CreateDataReply struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Uid    string `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	Status string `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+}
+
+func (x *CreateDataReply) Reset() {
+	*x = CreateDataReply{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_spec_document_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateDataReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDataReply) ProtoMessage() {}
+
+func (x *CreateDataReply) ProtoReflect() protoreflect.Message {
+	mi := &file_spec_document_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDataReply.ProtoReflect.Descriptor instead.
+func (*CreateDataReply) Descriptor() ([]byte, []int) {
+	return file_spec_document_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *CreateDataReply) GetUid() string {
+	if x != nil {
+		return x.Uid
+	}
+	return ""
+}
+
+func (x *CreateDataReply) GetStatus() string {
 	if x != nil {
 		return x.Status
 	}
@@ -205,25 +340,41 @@ var File_spec_document_proto protoreflect.FileDescriptor
 
 var file_spec_document_proto_rawDesc = []byte{
 	0x0a, 0x13, 0x73, 0x70, 0x65, 0x63, 0x2f, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x04, 0x6d, 0x61, 0x69, 0x6e, 0x22, 0x4c, 0x0a, 0x08, 0x44,
-	0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x74,
-	0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x09,
-	0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x22, 0x6f, 0x0a, 0x15, 0x43, 0x72, 0x65,
-	0x61, 0x74, 0x65, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x4d, 0x65, 0x73, 0x73, 0x61,
-	0x67, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x03, 0x75, 0x69, 0x64, 0x12, 0x2a, 0x0a, 0x08, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x6d, 0x61, 0x69, 0x6e, 0x2e, 0x44, 0x6f,
-	0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x08, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74,
-	0x12, 0x18, 0x0a, 0x07, 0x72, 0x65, 0x70, 0x6c, 0x79, 0x54, 0x6f, 0x18, 0x03, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x07, 0x72, 0x65, 0x70, 0x6c, 0x79, 0x54, 0x6f, 0x22, 0x3f, 0x0a, 0x13, 0x43, 0x72,
-	0x65, 0x61, 0x74, 0x65, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x70, 0x6c,
-	0x79, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03,
-	0x75, 0x69, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x02, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x42, 0x18, 0x5a, 0x16, 0x67,
-	0x69, 0x74, 0x6c, 0x61, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x72, 0x61, 0x62, 0x62, 0x69, 0x74,
-	0x2f, 0x73, 0x70, 0x65, 0x63, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x04, 0x73, 0x70, 0x65, 0x63, 0x22, 0x64, 0x0a, 0x0a, 0x53,
+	0x65, 0x6e, 0x73, 0x6f, 0x72, 0x44, 0x61, 0x74, 0x61, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1c, 0x0a, 0x09, 0x74, 0x69, 0x6d,
+	0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x09, 0x74, 0x69,
+	0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x12, 0x14, 0x0a, 0x05, 0x63, 0x68, 0x65, 0x73, 0x74,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x02, 0x52, 0x05, 0x63, 0x68, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a,
+	0x04, 0x73, 0x74, 0x6f, 0x6d, 0x18, 0x04, 0x20, 0x01, 0x28, 0x02, 0x52, 0x04, 0x73, 0x74, 0x6f,
+	0x6d, 0x22, 0x58, 0x0a, 0x0c, 0x41, 0x63, 0x74, 0x69, 0x76, 0x69, 0x74, 0x79, 0x44, 0x61, 0x74,
+	0x61, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69,
+	0x64, 0x12, 0x1c, 0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x03, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x12,
+	0x1a, 0x0a, 0x08, 0x61, 0x63, 0x74, 0x69, 0x76, 0x69, 0x74, 0x79, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x08, 0x61, 0x63, 0x74, 0x69, 0x76, 0x69, 0x74, 0x79, 0x22, 0x6b, 0x0a, 0x17, 0x43,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x65, 0x6e, 0x73, 0x6f, 0x72, 0x44, 0x61, 0x74, 0x61, 0x4d,
+	0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x03, 0x75, 0x69, 0x64, 0x12, 0x24, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x73, 0x70, 0x65, 0x63, 0x2e, 0x53, 0x65,
+	0x6e, 0x73, 0x6f, 0x72, 0x44, 0x61, 0x74, 0x61, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x12, 0x18,
+	0x0a, 0x07, 0x72, 0x65, 0x70, 0x6c, 0x79, 0x54, 0x6f, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x07, 0x72, 0x65, 0x70, 0x6c, 0x79, 0x54, 0x6f, 0x22, 0x6a, 0x0a, 0x14, 0x43, 0x72, 0x65, 0x61,
+	0x74, 0x65, 0x41, 0x63, 0x74, 0x44, 0x61, 0x74, 0x61, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
+	0x12, 0x10, 0x0a, 0x03, 0x75, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x75,
+	0x69, 0x64, 0x12, 0x26, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x12, 0x2e, 0x73, 0x70, 0x65, 0x63, 0x2e, 0x41, 0x63, 0x74, 0x69, 0x76, 0x69, 0x74, 0x79,
+	0x44, 0x61, 0x74, 0x61, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x12, 0x18, 0x0a, 0x07, 0x72, 0x65,
+	0x70, 0x6c, 0x79, 0x54, 0x6f, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x72, 0x65, 0x70,
+	0x6c, 0x79, 0x54, 0x6f, 0x22, 0x3b, 0x0a, 0x0f, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x44, 0x61,
+	0x74, 0x61, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x69, 0x64, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x75, 0x69, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x61,
+	0x74, 0x75, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75,
+	0x73, 0x42, 0x43, 0x5a, 0x41, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
+	0x73, 0x69, 0x69, 0x67, 0x65, 0x72, 0x2f, 0x73, 0x6d, 0x61, 0x72, 0x74, 0x2d, 0x6a, 0x61, 0x63,
+	0x6b, 0x65, 0x74, 0x2f, 0x53, 0x6f, 0x66, 0x74, 0x77, 0x61, 0x72, 0x65, 0x2f, 0x47, 0x6f, 0x6c,
+	0x61, 0x6e, 0x67, 0x5f, 0x6d, 0x69, 0x63, 0x72, 0x6f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
+	0x73, 0x2f, 0x73, 0x70, 0x65, 0x63, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -238,19 +389,22 @@ func file_spec_document_proto_rawDescGZIP() []byte {
 	return file_spec_document_proto_rawDescData
 }
 
-var file_spec_document_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_spec_document_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_spec_document_proto_goTypes = []interface{}{
-	(*Document)(nil),              // 0: main.Document
-	(*CreateDocumentMessage)(nil), // 1: main.CreateDocumentMessage
-	(*CreateDocumentReply)(nil),   // 2: main.CreateDocumentReply
+	(*SensorData)(nil),              // 0: spec.SensorData
+	(*ActivityData)(nil),            // 1: spec.ActivityData
+	(*CreateSensorDataMessage)(nil), // 2: spec.CreateSensorDataMessage
+	(*CreateActDataMessage)(nil),    // 3: spec.CreateActDataMessage
+	(*CreateDataReply)(nil),         // 4: spec.CreateDataReply
 }
 var file_spec_document_proto_depIdxs = []int32{
-	0, // 0: main.CreateDocumentMessage.document:type_name -> main.Document
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	0, // 0: spec.CreateSensorDataMessage.data:type_name -> spec.SensorData
+	1, // 1: spec.CreateActDataMessage.data:type_name -> spec.ActivityData
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_spec_document_proto_init() }
@@ -260,7 +414,7 @@ func file_spec_document_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_spec_document_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Document); i {
+			switch v := v.(*SensorData); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -272,7 +426,7 @@ func file_spec_document_proto_init() {
 			}
 		}
 		file_spec_document_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateDocumentMessage); i {
+			switch v := v.(*ActivityData); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -284,7 +438,31 @@ func file_spec_document_proto_init() {
 			}
 		}
 		file_spec_document_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateDocumentReply); i {
+			switch v := v.(*CreateSensorDataMessage); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_spec_document_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateActDataMessage); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_spec_document_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateDataReply); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -302,7 +480,7 @@ func file_spec_document_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_spec_document_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
