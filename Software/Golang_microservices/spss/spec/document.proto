@@ -1,21 +1,25 @@
 syntax="proto3";
 package spec;
-option go_package = "github.com/siiger/smart-jacket/Software/Golang_microservices/sps/spec";
+option go_package = "github.com/siiger/smart-jacket/Software/Golang_microservices/spss/spec";
 //protoc --go_out=. --go_opt=paths=source_relative ./spec/document.proto
 import "google/protobuf/timestamp.proto";
 
 message SensorData {
-    repeated string data = 1;
+    optional int64 id = 1;
+    google.protobuf.Timestamp timestamp = 2;
+    string chest = 3;
+    string stom = 4;
 }
 
 message ActivityData {
-    google.protobuf.Timestamp timestamp = 1;
-    string activity = 2;
+    optional int64 id = 1;
+    google.protobuf.Timestamp timestamp = 2;
+    string activity = 3;
 }
 
 message CreateSensorDataMessage {
     string uid = 1;
-    SensorData data = 2;
+    repeated SensorData data = 2;
     string replyTo = 3;
 }
 
